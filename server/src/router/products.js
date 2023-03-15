@@ -1,5 +1,5 @@
-import { ProductModel } from "../Models";
-import { Router } from "express";
+const { ProductModel } = require("../Models");
+const { Router } = require("express");
 
 const router = Router();
 
@@ -104,4 +104,4 @@ router.get("/delete/:id", (req, res) => {
     }
 });
 
-export default router;
+module.exports = router;

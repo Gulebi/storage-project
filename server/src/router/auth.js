@@ -1,5 +1,5 @@
-import { UserModel } from "../Models";
-import { Router } from "express";
+const { UserModel } = require("../Models");
+const { Router } = require("express");
 
 const router = Router();
 
@@ -48,4 +48,4 @@ router.post("/signup", (req, res) => {
     }
 });
 
-export default router;
+module.exports = router;

@@ -1,12 +1,14 @@
-import express, { Express, Request, Response } from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import mongoose from "mongoose";
-import "dotenv/config";
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 
-import router from "./router";
+dotenv.config();
 
-const port: number = parseInt(process.env.PORT!) || 3000;
+const router = require("./router/index.js");
+
+const port = process.env.PORT || 3000;
 const app = express();
 
 app.use(cors());
@@ -15,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use("/api", router);
 
-mongoose.connect(process.env.MONGODB_URI!).then(
+mongoose.connect(process.env.MONGODB_URI).then(
     () => {
         console.log("App has connected to MongoDB");
         app.listen(port, () => console.log(`App running at http://localhost:${port}/`));

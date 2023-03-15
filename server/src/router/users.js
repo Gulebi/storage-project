@@ -1,5 +1,5 @@
-import { UserModel } from "../Models";
-import { Router } from "express";
+const { UserModel } = require("../Models.js");
+const { Router } = require("express");
 
 const router = Router();
 
@@ -44,4 +44,4 @@ router.put("/addStorage/:id", (req, res) => {
     }
 });
 
-export default router;
+module.exports = router;
