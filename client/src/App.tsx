@@ -1,8 +1,14 @@
 import React from "react";
-import "./App.css";
+import { Button, MantineProvider, Text } from "@mantine/core";
+import { RouterProvider } from "react-router-dom";
+import router from "./router";
 
 function App() {
-    return <div>App</div>;
+    return (
+        <MantineProvider withGlobalStyles withNormalizeCSS>
+            <RouterProvider router={router} />
+        </MantineProvider>
+    );
 }
 
 export default App;
