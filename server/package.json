@@ -1,5 +1,6 @@
 {
     "name": "server",
+    "description": "storage-progect backend",
     "version": "0.0.1",
     "main": "./src/index.js",
     "scripts": {
@@ -7,6 +8,10 @@
         "dev": "nodemon ./src/index.js"
     },
     "author": "Gulebi",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Gulebi/storage-project.git"
+    },
     "license": "MIT",
     "dependencies": {
         "body-parser": "^1.20.2",

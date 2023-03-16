@@ -5,7 +5,7 @@ import router from "./router";
 
 function App() {
     return (
-        <MantineProvider withGlobalStyles withNormalizeCSS>
+        <MantineProvider theme={{ colorScheme: "light" }} withGlobalStyles withNormalizeCSS>
             <RouterProvider router={router} />
         </MantineProvider>
     );

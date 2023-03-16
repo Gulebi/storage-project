@@ -7,9 +7,9 @@ router.get("/login", (req, res) => {
     try {
         res.set("Content-Type", "application/json");
 
-        const { login, password } = req.body;
+        const { email, password } = req.body;
 
-        UserModel.findOne({ login }).then(
+        UserModel.findOne({ email }).then(
             (user) => {
                 if (!user) return res.status(404).send({ message: "Not Found" });
                 else {
@@ -32,9 +32,9 @@ router.post("/signup", (req, res) => {
     try {
         res.set("Content-Type", "application/json");
 
-        const { name, surname, login, password, status } = req.body;
+        const { username, email, password } = req.body;
 
-        UserModel.create({ name, surname, login, password, status }).then(
+        UserModel.create({ username, email, password }).then(
             (doc) => {
                 return res.status(201).send({ message: "Success", data: doc });
             },

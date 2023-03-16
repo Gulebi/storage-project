@@ -1,38 +1,51 @@
 const { Schema } = require("mongoose");
 
 const UserSchema = new Schema({
-    name: String,
     email: String,
-    login: String,
+    username: String,
     password: String,
-    storages: [
-        {
-            storageId: String,
-            status: { type: String, enum: ["admin", "user"] },
-        },
-    ],
+    storages: {
+        type: [
+            {
+                storageId: String,
+                status: { type: String, enum: ["admin", "user"] },
+            },
+        ],
+        default: [],
+    },
 });
 
 const ProductSchema = new Schema({
     name: String,
-    buyingPrice: Number,
-    buyingPriceHistory: [Number],
-    sellingPrice: Number,
-    sellingPriceHistory: [Number],
-    totalAmount: { type: Number, default: 0 },
-    storageId: String,
+    producer: String,
 });
 
 const StorageSchema = new Schema({
-    productsAmount: { type: Number, default: 0 },
+    name: String,
     totalMoney: { type: Number, default: 0 },
-    totalMoneyHistory: [Number],
-    operationsHistory: [
-        {
-            productId: String,
-            operationName: { type: String, enum: ["buying", "selling", "deleting"] },
-        },
-    ],
+    products: {
+        type: [
+            {
+                productId: String,
+                buyingPrice: Number,
+                buyingPriceHistory: { type: [Number], default: [] },
+                sellingPrice: Number,
+                sellingPriceHistory: { type: [Number], default: [] },
+                totalAmount: { type: Number, default: 0 },
+            },
+        ],
+        default: [],
+    },
+    totalMoneyHistory: { type: [Number], default: [] },
+    operationsHistory: {
+        type: [
+            {
+                productId: String,
+                operationName: { type: String, enum: ["buying", "selling", "deleting"] },
+            },
+        ],
+        default: [],
+    },
 });
 
 module.exports = { UserSchema, ProductSchema, StorageSchema };
