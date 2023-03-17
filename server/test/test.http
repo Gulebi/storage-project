@@ -1,12 +1,42 @@
-### POST User
+### POST Create Storage
 
-POST http://localhost:3000/api/auth/signup
+POST http://localhost:3000/api/storages/create
 content-type: application/json
 
 {
-    "name": "Gleb",
-    "surname": "Ivanov",
-    "login": "Guleb",
-    "password": "123",
-    "status": "user"
+    "name": "Based"
+}
+
+### POST Add Product To Storage
+
+POST http://localhost:3000/api/storages/addProduct/641364bf9cb7c37fab3b1f8f
+content-type: application/json
+
+{
+    "productId": "64136598e9d4d29aaf878650", 
+    "buyingPrice": 80, 
+    "sellingPrice": 90
+}
+
+### POST Storage Product Operation
+
+POST http://localhost:3000/api/storages/productOperation/641364bf9cb7c37fab3b1f8f
+content-type: application/json
+
+{
+    "productId": "64136598e9d4d29aaf878650", 
+    "operationName": "deleting"
+}
+
+### POST Create Product
+
+POST http://localhost:3000/api/products/create
+content-type: application/json
+
+{
+    "name": "Chair", 
+    "description": "The best chair", 
+    "category": "Furniture", 
+    "manufacturer": "Guleb Inc.", 
+    "manufacturerPrice": 75
 }

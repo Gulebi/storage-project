@@ -43,13 +43,13 @@ router.get("/getByStorageId/:id", (req, res) => {
     }
 });
 
-router.post("/add", (req, res) => {
+router.post("/create", (req, res) => {
     try {
         res.set("Content-Type", "application/json");
 
-        const { name, purchasePrice, sellingPrice, number } = req.body;
+        const { name, description, category, manufacturer, manufacturerPrice } = req.body;
 
-        ProductModel.create({ name, purchasePrice, sellingPrice, number }).then(
+        ProductModel.create({ name, description, category, manufacturer, manufacturerPrice }).then(
             (doc) => {
                 return res.status(201).send({ message: "Success", data: doc });
             },
@@ -68,9 +68,9 @@ router.put("/change/:id", (req, res) => {
         res.set("Content-Type", "application/json");
 
         const { id } = req.params;
-        const { name, purchasePrice, sellingPrice, number } = req.body;
+        const { name, description, category, manufacturer, manufacturerPrice } = req.body;
 
-        ProductModel.findByIdAndUpdate(id, { name, purchasePrice, sellingPrice, number }).then(
+        ProductModel.findByIdAndUpdate(id, { name, description, category, manufacturer, manufacturerPrice }).then(
             (doc) => {
                 return res.status(201).send({ message: "Success", data: doc });
             },
@@ -84,7 +84,7 @@ router.put("/change/:id", (req, res) => {
     }
 });
 
-router.get("/delete/:id", (req, res) => {
+router.delete("/delete/:id", (req, res) => {
     try {
         res.set("Content-Type", "application/json");
 

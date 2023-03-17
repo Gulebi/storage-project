@@ -1,52 +1,133 @@
-const { StorageModel, ProductModel } = require("../Models");
+const { StorageModel } = require("../Models");
 const { Router } = require("express");
 
 const router = Router();
 
-router.post("/create", (req, res) => {
+router.post("/create", async (req, res) => {
     try {
         res.set("Content-Type", "application/json");
 
-        const { name } = req.body;
+        const { name, adminId } = req.body;
 
-        StorageModel.create({ name }).then(
-            (doc) => {
-                return res.status(200).send({ message: "Success", data: doc });
-            },
-            () => {
-                return res.status(500).send({ message: "Error" });
-            }
-        );
+        await StorageModel.create({ name, adminId });
+
+        return res.status(201).send({ message: "Success" });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });
     }
 });
 
-// router.post("/operation/:id", async (req, res) => {
-//     try {
-//         res.set("Content-Type", "application/json");
+router.delete("/delete/:id", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
 
-//         const { productId, operationName } = req.body;
+        const { id } = req.params;
 
-//         if (operationName === "buying") {
-//             await ProductModel.findByIdAndUpdate(productId, { $inc: { totalAmount: 1 } });
-//         } else if (operationName === "selling") {
-//             await ProductModel.findByIdAndUpdate(productId, { $inc: { totalAmount: -1 } });
-//         }
+        await StorageModel.findByIdAndDelete(id);
 
-//         StorageModel.findByIdAndUpdate(id, { $push: { operationsHistory: { productId, operationName } } }).then(
-//             (doc) => {
-//                 return res.status(200).send({ message: "Success", data: doc });
-//             },
-//             () => {
-//                 return res.status(500).send({ message: "Error" });
-//             }
-//         );
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).send({ message: "Error" });
-//     }
-// });
+        return res.status(201).send({ message: "Success" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.post("/addProduct/:id", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id: storageId } = req.params;
+        const { productId, buyingPrice, sellingPrice } = req.body;
+
+        await StorageModel.findByIdAndUpdate(storageId, {
+            $push: {
+                products: {
+                    _id: productId,
+                    buyingPrice,
+                    sellingPrice,
+                    buyingPriceHistory: [buyingPrice],
+                    sellingPriceHistory: [sellingPrice],
+                },
+            },
+        });
+
+        return res.status(201).send({ message: "Success" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.post("/productOperation/:id", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id: storageId } = req.params;
+        const { productId, operationName } = req.body;
+
+        if (operationName === "buying") {
+            await StorageModel.findOneAndUpdate(
+                { _id: storageId, "products._id": productId },
+                { $inc: { "products.$.totalAmount": 1 } }
+            );
+            await StorageModel.findByIdAndUpdate(storageId, {
+                $push: { operationsHistory: { productId, operationName } },
+            });
+        } else if (operationName === "selling") {
+            await StorageModel.findOneAndUpdate(
+                { _id: storageId, "products._id": productId },
+                { $inc: { "products.$.totalAmount": -1 } }
+            );
+            await StorageModel.findByIdAndUpdate(storageId, {
+                $push: { operationsHistory: { productId, operationName } },
+            });
+        } else if (operationName === "deleting") {
+            await StorageModel.findByIdAndUpdate(storageId, { $pull: { products: { _id: productId } } });
+            await StorageModel.findByIdAndUpdate(storageId, {
+                $push: { operationsHistory: { productId, operationName } },
+            });
+        }
+
+        return res.status(201).send({ message: "Success" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.post("/changeProductPrice/:id", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id: storageId } = req.params;
+        const { productId, operationName, newPrice } = req.body;
+
+        if (operationName === "buying") {
+            await StorageModel.findOneAndUpdate(
+                { _id: storageId, "products._id": productId },
+                { $set: { "products.$.buyingPrice": newPrice } }
+            );
+            await StorageModel.findOneAndUpdate(
+                { _id: storageId, "products._id": productId },
+                { $push: { "products.$.buyingPriceHistory": newPrice } }
+            );
+        } else if (operationName === "selling") {
+            await StorageModel.findOneAndUpdate(
+                { _id: storageId, "products._id": productId },
+                { $set: { "products.$.sellingPrice": newPrice } }
+            );
+            await StorageModel.findOneAndUpdate(
+                { _id: storageId, "products._id": productId },
+                { $push: { "products.$.sellingPriceHistory": newPrice } }
+            );
+        }
+
+        return res.status(201).send({ message: "Success" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
 
 module.exports = router;

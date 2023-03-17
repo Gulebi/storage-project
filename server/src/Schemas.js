@@ -17,12 +17,19 @@ const UserSchema = new Schema({
 
 const ProductSchema = new Schema({
     name: String,
-    producer: String,
+    description: String,
+    category: String,
+    manufacturer: String,
+    manufacturerPrice: Number,
+    creationDate: { type: Date, default: Date.now },
 });
 
 const StorageSchema = new Schema({
     name: String,
+    adminId: String,
+    creationDate: { type: Date, default: Date.now },
     totalMoney: { type: Number, default: 0 },
+    totalMoneyHistory: { type: [Number], default: [0] },
     products: {
         type: [
             {
@@ -36,12 +43,12 @@ const StorageSchema = new Schema({
         ],
         default: [],
     },
-    totalMoneyHistory: { type: [Number], default: [] },
     operationsHistory: {
         type: [
             {
                 productId: String,
                 operationName: { type: String, enum: ["buying", "selling", "deleting"] },
+                operationDate: { type: Date, default: Date.now },
             },
         ],
         default: [],

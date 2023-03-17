@@ -14,8 +14,9 @@ import {
     Box,
     rem,
 } from "@mantine/core";
+import { IAuthValues } from "@/types";
 
-function LoginPage() {
+function AuthPage() {
     const [type, toggle] = useToggle(["login", "register"]);
 
     const form = useForm({
@@ -31,6 +32,10 @@ function LoginPage() {
             password: (val) => (val.length < 8 ? "Password should include at least 8 characters" : null),
         },
     });
+
+    const onFormSubmit = (values: IAuthValues) => {
+        console.log(values);
+    };
 
     return (
         <Box
@@ -50,7 +55,7 @@ function LoginPage() {
                     {upperFirst(type)}
                 </Text>
 
-                <form onSubmit={form.onSubmit((values) => console.log(values))}>
+                <form onSubmit={form.onSubmit((values) => onFormSubmit(values))}>
                     <Stack>
                         {type === "register" && (
                             <TextInput
@@ -106,4 +111,4 @@ function LoginPage() {
     );
 }
 
-export default LoginPage;
+export default AuthPage;
