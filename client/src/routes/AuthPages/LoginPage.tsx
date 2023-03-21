@@ -1,28 +1,15 @@
-import { useToggle, upperFirst } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
-import {
-    TextInput,
-    PasswordInput,
-    Text,
-    Paper,
-    Group,
-    PaperProps,
-    Button,
-    Checkbox,
-    Anchor,
-    Stack,
-    Box,
-    rem,
-} from "@mantine/core";
+import { TextInput, PasswordInput, Text, Paper, Group, Button, Checkbox, Anchor, Stack, Box, rem } from "@mantine/core";
 import { IAuthValues } from "@/types";
+import { useNavigate } from "react-router-dom";
+import apiClient from "../../common/api";
 
-function AuthPage() {
-    const [type, toggle] = useToggle(["login", "register"]);
+function LoginPage() {
+    const navigate = useNavigate();
 
     const form = useForm({
         initialValues: {
             email: "",
-            username: "",
             password: "",
             remember: false,
         },
@@ -33,8 +20,12 @@ function AuthPage() {
         },
     });
 
-    const onFormSubmit = (values: IAuthValues) => {
-        console.log(values);
+    const onFormSubmit = async (values: IAuthValues) => {
+        const authRes = await apiClient.post("/auth/login", values);
+
+        localStorage.setItem("currentUserId", authRes?.data.data);
+
+        navigate("/");
     };
 
     return (
@@ -48,26 +39,15 @@ function AuthPage() {
         >
             <Paper radius="md" p="xl" withBorder>
                 <Text size="xl" weight={500} ta="center">
-                    Welcome to Storage
+                    Welcome back to Storage
                 </Text>
 
                 <Text size="lg" weight={500} ta="center">
-                    {upperFirst(type)}
+                    Log in
                 </Text>
 
                 <form onSubmit={form.onSubmit((values) => onFormSubmit(values))}>
                     <Stack>
-                        {type === "register" && (
-                            <TextInput
-                                required
-                                label="Username"
-                                placeholder="Your username"
-                                value={form.values.username}
-                                onChange={(event) => form.setFieldValue("username", event.currentTarget.value)}
-                                radius="md"
-                            />
-                        )}
-
                         <TextInput
                             required
                             label="Email"
@@ -88,21 +68,25 @@ function AuthPage() {
                             radius="md"
                         />
 
-                        {type === "login" && (
-                            <Checkbox
-                                label="Remember me"
-                                checked={form.values.remember}
-                                onChange={(event) => form.setFieldValue("remember", event.currentTarget.checked)}
-                            />
-                        )}
+                        <Checkbox
+                            label="Remember me"
+                            checked={form.values.remember}
+                            onChange={(event) => form.setFieldValue("remember", event.currentTarget.checked)}
+                        />
                     </Stack>
 
                     <Group position="apart" mt="xl">
-                        <Anchor component="button" type="button" color="dimmed" onClick={() => toggle()} size="xs">
-                            {type === "register" ? "Already have an account? Login" : "Don't have an account? Register"}
+                        <Anchor
+                            component="button"
+                            type="button"
+                            color="dimmed"
+                            onClick={() => navigate("/signup")}
+                            size="xs"
+                        >
+                            Don't have an account? Sign up
                         </Anchor>
                         <Button type="submit" radius="xl">
-                            {upperFirst(type)}
+                            Log in
                         </Button>
                     </Group>
                 </form>
@@ -111,4 +95,4 @@ function AuthPage() {
     );
 }
 
-export default AuthPage;
+export default LoginPage;

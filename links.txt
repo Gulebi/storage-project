@@ -1,3 +1,6 @@
 https://tabler-icons.io/
 https://mantine.dev/
 https://ui.mantine.dev/
+https://recharts.org/
+https://www.chartjs.org/
+https://www.mockaroo.com/

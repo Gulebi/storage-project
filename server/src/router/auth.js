@@ -3,7 +3,7 @@ const { Router } = require("express");
 
 const router = Router();
 
-router.get("/login", (req, res) => {
+router.post("/login", (req, res) => {
     try {
         res.set("Content-Type", "application/json");
 
@@ -36,7 +36,7 @@ router.post("/signup", (req, res) => {
 
         UserModel.create({ username, email, password }).then(
             (doc) => {
-                return res.status(201).send({ message: "Success", data: doc });
+                return res.status(201).send({ message: "Success", data: doc._id });
             },
             () => {
                 return res.status(500).send({ message: "Error" });

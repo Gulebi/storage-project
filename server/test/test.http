@@ -28,15 +28,31 @@ content-type: application/json
     "operationName": "deleting"
 }
 
+### GET Storage Products
+
+GET http://localhost:3000/api/storages/getProducts/641364bf9cb7c37fab3b1f8f
+
+### POST Buy Product
+
+POST http://localhost:3000/api/storages/buyProduct/641364bf9cb7c37fab3b1f8f
+content-type: application/json
+
+{
+    "productId": "6414ad1601f297b14f36ea53", 
+    "buyingPrice": 120,
+    "totalAmount": 10
+}
+
 ### POST Create Product
 
 POST http://localhost:3000/api/products/create
 content-type: application/json
 
 {
-    "name": "Chair", 
-    "description": "The best chair", 
-    "category": "Furniture", 
-    "manufacturer": "Guleb Inc.", 
-    "manufacturerPrice": 75
+    "name":"Mens Cotton Jacket",
+    "manufacturerPrice":55,
+    "description":"great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions, such as working, hiking, camping, mountain/rock climbing, cycling, traveling or other outdoors. Good gift choice for you or your family member. A warm hearted love to Father, husband or son in this thanksgiving or Christmas Day.",
+    "category":"Men's clothing",
+    "image":"https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg",
+    "manufacturer": "Guleb Inc."
 }

@@ -17,6 +17,7 @@ const UserSchema = new Schema({
 
 const ProductSchema = new Schema({
     name: String,
+    image: String,
     description: String,
     category: String,
     manufacturer: String,
@@ -33,12 +34,11 @@ const StorageSchema = new Schema({
     products: {
         type: [
             {
-                productId: String,
                 buyingPrice: Number,
                 buyingPriceHistory: { type: [Number], default: [] },
                 sellingPrice: Number,
                 sellingPriceHistory: { type: [Number], default: [] },
-                totalAmount: { type: Number, default: 0 },
+                totalAmount: Number,
             },
         ],
         default: [],
@@ -46,8 +46,8 @@ const StorageSchema = new Schema({
     operationsHistory: {
         type: [
             {
-                productId: String,
                 operationName: { type: String, enum: ["buying", "selling", "deleting"] },
+                amount: Number,
                 operationDate: { type: Date, default: Date.now },
             },
         ],
