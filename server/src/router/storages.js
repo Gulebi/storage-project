@@ -51,6 +51,86 @@ router.get("/:id/getProducts", async (req, res) => {
                     from: "products",
                     localField: "products._id",
                     foreignField: "_id",
+                    as: "productsDetails",
+                },
+            },
+            {
+                $project: {
+                    name: 1,
+                    products: {
+                        $map: {
+                            input: "$products",
+                            as: "product",
+                            in: {
+                                $mergeObjects: [
+                                    "$$product",
+                                    {
+                                        $first: {
+                                            $filter: {
+                                                input: "$productsDetails",
+                                                cond: { $eq: ["$$this._id", "$$product._id"] },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        ]);
+
+        return res.status(200).send({ message: "Success", data: mRes[0]?.products });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.get("/:id/getBalance", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id } = req.params;
+
+        const mRes = await StorageModel.findById(id);
+
+        return res.status(201).send({ message: "Success", data: mRes.totalMoney });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.post("/:id/findProduct", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id } = req.params;
+        const { productCode } = req.body;
+
+        const mRes = await StorageModel.aggregate([
+            {
+                $match: {
+                    _id: new Types.ObjectId(id),
+                },
+            },
+            {
+                $set: {
+                    products: {
+                        $filter: {
+                            input: "$products",
+                            as: "product",
+                            cond: { $eq: ["$$product.code", productCode] },
+                        },
+                    },
+                },
+            },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "products._id",
+                    foreignField: "_id",
                     as: "productDetails",
                 },
             },
@@ -80,22 +160,7 @@ router.get("/:id/getProducts", async (req, res) => {
             },
         ]);
 
-        return res.status(200).send({ message: "Success", data: mRes[0]?.products });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).send({ message: "Error" });
-    }
-});
-
-router.get("/:id/getBalance", async (req, res) => {
-    try {
-        res.set("Content-Type", "application/json");
-
-        const { id } = req.params;
-
-        const mRes = await StorageModel.findById(id);
-
-        return res.status(201).send({ message: "Success", data: mRes.totalMoney });
+        return res.status(200).send({ message: "Success", data: mRes[0]?.products[0] });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });
@@ -138,6 +203,7 @@ router.post("/:id/buyProduct", async (req, res) => {
                 {
                     $inc: { "products.$.totalAmount": amount },
                     $set: { "products.$.buyingPrice": buyingPrice },
+                    $push: { "products.$.buyingPriceHistory": buyingPrice },
                 }
             );
         }
@@ -147,6 +213,33 @@ router.post("/:id/buyProduct", async (req, res) => {
         });
 
         return res.status(201).send({ message: "Success" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.post("/:id/sellProduct", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id: storageId } = req.params;
+        const { productId, amount } = req.body;
+
+        await StorageModel.findOneAndUpdate(
+            { _id: storageId, "products._id": productId },
+            {
+                $inc: { "products.$.totalAmount": -amount },
+                $set: { "products.$.sellingPrice": sellingPrice },
+                $push: { "products.$.sellingPriceHistory": sellingPrice },
+            }
+        );
+
+        await StorageModel.findByIdAndUpdate(storageId, {
+            $push: { operationsHistory: { _id: productId, operationName: "selling", amount } },
+        });
+
+        return res.status(200).send({ message: "Success" });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });

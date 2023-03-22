@@ -25,7 +25,7 @@ function SignupPage() {
 
         localStorage.setItem("currentUserId", authRes?.data.data);
 
-        navigate("/");
+        navigate("/dashboard");
     };
 
     return (

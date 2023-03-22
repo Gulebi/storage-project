@@ -1,10 +1,9 @@
 import { IProduct } from "@/types";
-import { Card, Image, Flex, Text, Group, Button, createStyles, Stack, rem } from "@mantine/core";
+import { Card, Image, Flex, Text, Group, Button, createStyles, Stack } from "@mantine/core";
 
 interface IProductCardProps {
     data: IProduct;
-    open: () => void;
-    setCurrentlyChosen: (product: IProduct) => void;
+    onOpenModal: (product: IProduct) => void;
 }
 
 const useStyles = createStyles((theme) => ({
@@ -21,7 +20,7 @@ const useStyles = createStyles((theme) => ({
     },
 }));
 
-function ProductCard({ data, open, setCurrentlyChosen }: IProductCardProps) {
+function ProductCard({ data, onOpenModal }: IProductCardProps) {
     const { classes, theme } = useStyles();
 
     return (
@@ -44,8 +43,7 @@ function ProductCard({ data, open, setCurrentlyChosen }: IProductCardProps) {
                 <Button
                     mt="auto"
                     onClick={() => {
-                        setCurrentlyChosen(data);
-                        open();
+                        onOpenModal(data);
                     }}
                 >
                     Buy Product

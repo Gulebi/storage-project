@@ -20,12 +20,10 @@ const data = [
     { link: "/dashboard/profile", codename: "profile", label: "Profile", icon: IconUserCircle },
 ];
 
-function DashboardNavbar() {
+function DashboardNavbar({ onLogOut }: { onLogOut: () => void }) {
     const location = useLocation();
     const navigate = useNavigate();
     const [active, setActive] = useState(location.pathname.split("/").at(2)!);
-
-    console.log(location.pathname.split("/").at(-1));
 
     const links = data.map((item) => (
         <NavLink
@@ -77,7 +75,7 @@ function DashboardNavbar() {
             <Divider my="sm" />
 
             <Navbar.Section>
-                <NavLink label="Log out" icon={<IconLogout stroke={1.5} />} />
+                <NavLink label="Log out" icon={<IconLogout stroke={1.5} />} onClick={onLogOut} />
             </Navbar.Section>
         </Navbar>
     );

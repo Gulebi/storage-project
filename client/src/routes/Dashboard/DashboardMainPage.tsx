@@ -14,8 +14,14 @@ function DashboardMainPage() {
         }
     }, []);
 
+    const onLogOut = () => {
+        console.log("Log out");
+        localStorage.removeItem("currentUserId");
+        navigate("/login");
+    };
+
     return (
-        <AppShell padding="md" navbar={<DashboardNavbar />}>
+        <AppShell padding="md" navbar={<DashboardNavbar onLogOut={onLogOut} />}>
             <Outlet />
         </AppShell>
     );

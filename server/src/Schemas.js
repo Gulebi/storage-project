@@ -1,4 +1,5 @@
 const { Schema } = require("mongoose");
+const { uid } = require("./utils");
 
 const UserSchema = new Schema({
     email: String,
@@ -34,6 +35,7 @@ const StorageSchema = new Schema({
     products: {
         type: [
             {
+                code: { type: String, default: uid },
                 buyingPrice: Number,
                 buyingPriceHistory: { type: [Number], default: [] },
                 sellingPrice: Number,

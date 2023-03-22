@@ -25,7 +25,7 @@ function LoginPage() {
 
         localStorage.setItem("currentUserId", authRes?.data.data);
 
-        navigate("/");
+        navigate("/dashboard");
     };
 
     return (

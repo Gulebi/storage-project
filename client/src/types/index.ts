@@ -25,6 +25,7 @@ export interface IProduct {
 }
 
 export interface IStorageProduct extends IProduct {
+    code: string;
     buyingPrice: number;
     buyingPriceHistory: number[];
     sellingPrice: number;
@@ -32,8 +33,12 @@ export interface IStorageProduct extends IProduct {
     totalAmount: number;
 }
 
+export interface IStorageSaleProduct extends IStorageProduct {
+    amount: number;
+}
+
 export interface IStorageOperation extends IProduct {
     operationName: string;
     operationDate: string;
-    amount?: Number;
+    amount?: number;
 }

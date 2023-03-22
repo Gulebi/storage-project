@@ -67,8 +67,9 @@ function DashboardProductsPage() {
         };
     };
 
-    const rows = products.map((product) => (
+    const rows = products.map((product: IStorageProduct) => (
         <tr key={product._id}>
+            <td>{product.code}</td>
             <td>{product.name}</td>
             <td>{product.buyingPrice}</td>
             <td>
@@ -151,6 +152,7 @@ function DashboardProductsPage() {
                     <Table>
                         <thead>
                             <tr>
+                                <th>Code</th>
                                 <th>Name</th>
                                 <th>Buying Price</th>
                                 <th>Selling Price</th>
