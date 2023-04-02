@@ -12,6 +12,7 @@ import {
     StorageSalesPage,
     StorageSettingsPage,
     StorageInfoPage,
+    StorageSelectionPage,
 } from "./routes";
 
 const router = createBrowserRouter([
@@ -24,24 +25,25 @@ const router = createBrowserRouter([
         path: "/dashboard",
         element: <DashboardMainPage />,
         children: [
+            { index: true, element: <StorageSelectionPage /> },
             {
-                path: "/dashboard/storage/info",
+                path: "/dashboard/storage/:id/info",
                 element: <StorageInfoPage />,
             },
             {
-                path: "/dashboard/storage/sales",
+                path: "/dashboard/storage/:id/sales",
                 element: <StorageSalesPage />,
             },
             {
-                path: "/dashboard/storage/products",
+                path: "/dashboard/storage/:id/products",
                 element: <StorageProductsPage />,
             },
             {
-                path: "/dashboard/storage/settings",
+                path: "/dashboard/storage/:id/settings",
                 element: <StorageSettingsPage />,
             },
             {
-                path: "/dashboard/storage/history",
+                path: "/dashboard/storage/:id/history",
                 element: <StorageHistoryPage />,
             },
             {

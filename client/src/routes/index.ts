@@ -5,6 +5,7 @@ export { default as SignupPage } from "./AuthPages/SignupPage";
 export { default as LoginPage } from "./AuthPages/LoginPage";
 
 export { default as DashboardMainPage } from "./Dashboard/DashboardMainPage";
+export { default as StorageSelectionPage } from "./Dashboard/StorageSelectionPage";
 export { default as ProductsPage } from "./Dashboard/ProductsPage";
 export { default as ProfilePage } from "./Dashboard/ProfilePage";
 

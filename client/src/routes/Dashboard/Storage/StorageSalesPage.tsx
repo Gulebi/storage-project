@@ -13,17 +13,23 @@ import {
     Card,
     Stack,
     TextInput,
+    LoadingOverlay,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { modals } from "@mantine/modals";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import apiClient from "../../../common/api";
+import { useNavigate, useParams } from "react-router-dom";
 
 function DashboardSalesPage() {
     const [foundData, setFoundData] = useState<IStorageProduct>();
     const [sales, setSales] = useState<IStorageSaleProduct[]>([]);
     const [opened, { close, open }] = useDisclosure(false);
+    const navigate = useNavigate();
+    const { id: storageId } = useParams();
+
+    const [visible, { toggle }] = useDisclosure(true);
 
     const ref = useClickOutside(() => close());
 
@@ -45,12 +51,18 @@ function DashboardSalesPage() {
 
     const onFind = async ({ code }: { code: string }) => {
         if (foundData?.code !== code) {
-            const res = await apiClient.post("/storages/641364bf9cb7c37fab3b1f8f/findProduct", { productCode: code });
+            const res = await apiClient.post(`/storages/${storageId}/findProduct`, { productCode: code });
 
-            setFoundData(res.data.data);
+            if (res.data.data) {
+                setFoundData(res.data.data);
+
+                addForm.values.amount = 1;
+                open();
+            }
+        } else {
+            addForm.values.amount = 1;
+            open();
         }
-        addForm.values.amount = 1;
-        open();
     };
 
     const onAdd = ({ amount }: { amount: number }) => {
@@ -60,7 +72,7 @@ function DashboardSalesPage() {
     };
 
     const onSellOne = async (product: IStorageSaleProduct) => {
-        await apiClient.post("/storages/641364bf9cb7c37fab3b1f8f/sellProduct", {
+        await apiClient.post(`/storages/${storageId}/sellProduct`, {
             productId: product._id,
             amount: product.amount,
         });
@@ -69,7 +81,7 @@ function DashboardSalesPage() {
 
     const onSellAll = () => {
         sales.forEach((item) => {
-            apiClient.post("/storages/641364bf9cb7c37fab3b1f8f/sellProduct", {
+            apiClient.post(`/storages/${storageId}/sellProduct`, {
                 productId: item._id,
                 amount: item.amount,
             });
@@ -123,8 +135,26 @@ function DashboardSalesPage() {
         };
     };
 
+    useEffect(() => {
+        (async () => {
+            try {
+                const existsRes = await apiClient.get(`/storages/${storageId}/exists`);
+
+                if (!existsRes.data.data) {
+                    navigate("/dashboard");
+                } else {
+                }
+            } catch (error) {
+                console.log({ error });
+            } finally {
+                toggle();
+            }
+        })();
+    }, []);
+
     return (
-        <Container size="sm">
+        <Container size="sm" h="100%" pos="relative">
+            <LoadingOverlay visible={visible} overlayBlur={2} />
             <Title order={3} mb="md" align="center">
                 Sales
             </Title>

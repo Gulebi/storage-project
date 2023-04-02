@@ -1,29 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navbar, Group, Divider, NavLink, Code, Title, Button } from "@mantine/core";
 import { IconLogout, IconBuildingStore, IconUserCircle, IconBuildingWarehouse } from "@tabler/icons-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Logo } from "../components";
 
-const data = [
-    {
-        label: "Storage",
-        codename: "storage",
-        children: [
-            { link: "/dashboard/storage/info", label: "Info" },
-            { link: "/dashboard/storage/sales", label: "Sales" },
-            { link: "/dashboard/storage/history", label: "History" },
-            { link: "/dashboard/storage/products", label: "Products" },
-            { link: "/dashboard/storage/settings", label: "Setting" },
-        ],
-        icon: IconBuildingWarehouse,
-    },
-    { link: "/dashboard/products", codename: "products", label: "Browse Products", icon: IconBuildingStore },
-    { link: "/dashboard/profile", codename: "profile", label: "Profile", icon: IconUserCircle },
-];
+interface IDashboardNavbarProps {
+    onLogOut: () => void;
+    onChangeBalance: () => void;
+    balance: number;
+}
 
-function DashboardNavbar({ onLogOut }: { onLogOut: () => void }) {
+function DashboardNavbar({ onLogOut, onChangeBalance, balance }: IDashboardNavbarProps) {
     const location = useLocation();
     const navigate = useNavigate();
     const [active, setActive] = useState(location.pathname.split("/").at(2)!);
+    const { id: storageId } = useParams();
+
+    const data = [
+        {
+            label: "Storage",
+            codename: "storage",
+            children: [
+                { link: `/dashboard/storage/${storageId}/info`, label: "Info" },
+                { link: `/dashboard/storage/${storageId}/sales`, label: "Sales" },
+                { link: `/dashboard/storage/${storageId}/history`, label: "History" },
+                { link: `/dashboard/storage/${storageId}/products`, label: "Products" },
+                { link: `/dashboard/storage/${storageId}/settings`, label: "Setting" },
+            ],
+            icon: IconBuildingWarehouse,
+        },
+        { link: "/dashboard/products", codename: "products", label: "Browse Products", icon: IconBuildingStore },
+        { link: "/dashboard/profile", codename: "profile", label: "Profile", icon: IconUserCircle },
+    ];
 
     const links = data.map((item) => (
         <NavLink
@@ -53,10 +61,7 @@ function DashboardNavbar({ onLogOut }: { onLogOut: () => void }) {
     return (
         <Navbar width={{ sm: 300 }} p="md">
             <Navbar.Section>
-                <Group position="apart">
-                    <Title order={3}>StorageMaster</Title>
-                    <Code sx={{ fontWeight: 700 }}>v0.0.1</Code>
-                </Group>
+                <Logo />
             </Navbar.Section>
 
             <Divider my="sm" />
@@ -67,8 +72,10 @@ function DashboardNavbar({ onLogOut }: { onLogOut: () => void }) {
 
             <Navbar.Section>
                 <Group position="apart">
-                    <Title order={5}>Money: 1000</Title>
-                    <Button compact>Change</Button>
+                    <Title order={5}>{`Balance: ${balance}`}</Title>
+                    <Button compact onClick={onChangeBalance}>
+                        Change
+                    </Button>
                 </Group>
             </Navbar.Section>
 

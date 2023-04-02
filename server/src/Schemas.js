@@ -8,7 +8,6 @@ const UserSchema = new Schema({
     storages: {
         type: [
             {
-                storageId: String,
                 status: { type: String, enum: ["admin", "user"] },
             },
         ],

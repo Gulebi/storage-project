@@ -1,6 +1,6 @@
 const { StorageModel } = require("../Models");
 const { Router } = require("express");
-const { Types } = require("mongoose");
+const { Types, isValidObjectId } = require("mongoose");
 
 const router = Router();
 
@@ -13,6 +13,28 @@ router.post("/create", async (req, res) => {
         await StorageModel.create({ name, adminId });
 
         return res.status(201).send({ message: "Success" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.get("/:id/exists", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id } = req.params;
+
+        let exists;
+
+        if (isValidObjectId(id)) {
+            const mRes = await StorageModel.exists({ _id: new Types.ObjectId(id) });
+            exists = !!mRes;
+        } else {
+            exists = false;
+        }
+
+        return res.status(200).send({ message: "Success", data: exists });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });
@@ -93,9 +115,25 @@ router.get("/:id/getBalance", async (req, res) => {
 
         const { id } = req.params;
 
-        const mRes = await StorageModel.findById(id);
+        const mRes = await StorageModel.findById(id, { totalMoney: 1 });
 
-        return res.status(201).send({ message: "Success", data: mRes.totalMoney });
+        return res.status(200).send({ message: "Success", data: mRes });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.post("/:id/setBalance", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id } = req.params;
+        const { balance } = req.body;
+
+        await StorageModel.findByIdAndUpdate(id, { totalMoney: balance });
+
+        return res.status(201).send({ message: "Success" });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });
@@ -191,9 +229,9 @@ router.post("/:id/buyProduct", async (req, res) => {
                         _id: productId,
                         buyingPrice,
                         sellingPrice,
+                        totalAmount: amount,
                         buyingPriceHistory: [buyingPrice],
                         sellingPriceHistory: [sellingPrice],
-                        totalAmount: amount,
                     },
                 },
             });
@@ -270,16 +308,35 @@ router.post("/:id/changeProductSellingPrice", async (req, res) => {
         res.set("Content-Type", "application/json");
 
         const { id: storageId } = req.params;
-        const { productId, newPrice } = req.body;
+        const { productId, newValue } = req.body;
 
         await StorageModel.findOneAndUpdate(
             { _id: storageId, "products._id": productId },
-            { $set: { "products.$.sellingPrice": newPrice } }
+            { $set: { "products.$.sellingPrice": newValue } }
         );
 
         await StorageModel.findOneAndUpdate(
             { _id: storageId, "products._id": productId },
-            { $push: { "products.$.sellingPriceHistory": newPrice } }
+            { $push: { "products.$.sellingPriceHistory": newValue } }
+        );
+
+        return res.status(201).send({ message: "Success" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.post("/:id/changeProductTotalAmount", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id: storageId } = req.params;
+        const { productId, newValue } = req.body;
+
+        await StorageModel.findOneAndUpdate(
+            { _id: storageId, "products._id": productId },
+            { $set: { "products.$.totalAmount": newValue } }
         );
 
         return res.status(201).send({ message: "Success" });

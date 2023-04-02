@@ -15,31 +15,43 @@ import { modals } from "@mantine/modals";
 import { IStorageProduct } from "../../../types";
 import apiClient from "../../../common/api";
 import { upperFirst, useDisclosure } from "@mantine/hooks";
+import { useNavigate, useParams } from "react-router-dom";
+import { useForm } from "@mantine/form";
 
 function DashboardProductsPage() {
     const [products, setProducts] = useState<IStorageProduct[]>([]);
+    const navigate = useNavigate();
+    const { id: storageId } = useParams();
 
     const [visible, { open: openOverlay, close: closeOverlay }] = useDisclosure(false);
+
+    const changeForm = useForm({
+        initialValues: {
+            number: 1,
+        },
+    });
 
     const ChangeModal = (data: IStorageProduct, field: keyof IStorageProduct) => {
         return {
             title: `Change ${upperFirst(field)} field`,
             children: (
                 <>
-                    <Stack spacing="sm" align="center">
-                        <Text>{data.name}</Text>
-                        <Group>
-                            <NumberInput placeholder="Change field" min={0} defaultValue={+data[field]} />
-                            <Button
-                                onClick={() => {
-                                    modals.closeAll();
-                                    onChange(data, field);
-                                }}
-                            >
-                                Change
-                            </Button>
-                        </Group>
-                    </Stack>
+                    <form onSubmit={changeForm.onSubmit(({ number }) => onChangeFormSubmit(data._id, number, field))}>
+                        <Stack spacing="sm" align="center">
+                            <Text>{data.name}</Text>
+                            <Group>
+                                <NumberInput
+                                    placeholder="Change field"
+                                    min={0}
+                                    defaultValue={+data[field]}
+                                    // value={changeForm.values.number}
+                                    // onChange={(value) => changeForm.setFieldValue("number", value || 1)}
+                                    {...changeForm.getInputProps("number")}
+                                />
+                                <Button type="submit">Change</Button>
+                            </Group>
+                        </Stack>
+                    </form>
                 </>
             ),
         };
@@ -116,7 +128,7 @@ function DashboardProductsPage() {
     const loadProducts = async () => {
         try {
             openOverlay();
-            const productsRes = await apiClient.get("/storages/641364bf9cb7c37fab3b1f8f/getProducts");
+            const productsRes = await apiClient.get(`/storages/${storageId}/getProducts`);
             setProducts(productsRes.data.data);
         } catch (error) {
             console.log({ error });
@@ -126,45 +138,54 @@ function DashboardProductsPage() {
     };
 
     const onDelete = (id: IStorageProduct["_id"]) => {
-        apiClient.post("/storages/641364bf9cb7c37fab3b1f8f/deleteProduct", { productId: id });
+        apiClient.post(`/storages/${storageId}/deleteProduct`, { productId: id });
         loadProducts();
     };
 
-    const onChange = (data: IStorageProduct, field: string) => {
-        // apiClient.post("/storages/641364bf9cb7c37fab3b1f8f/deleteProduct", { productId: data._id });
-        loadProducts();
+    const onChangeFormSubmit = (id: string, value: number, field: string) => {
+        console.log(value);
+
+        // modals.closeAll();
+        // apiClient.post(`/storages/${storageId}/changeProduct${upperFirst(field)}`, { productId: id, newValue: value });
+        // loadProducts();
     };
 
     useEffect(() => {
-        loadProducts();
+        (async () => {
+            const existsRes = await apiClient.get(`/storages/${storageId}/exists`);
+
+            if (!existsRes.data.data) {
+                navigate("/dashboard");
+            } else {
+                loadProducts();
+            }
+        })();
     }, []);
 
     return (
-        <>
+        <Container size="lg" h="100%" pos="relative">
             <LoadingOverlay visible={visible} overlayBlur={2} />
 
-            <Container size="lg">
-                <Title order={3} mb="md" align="center">
-                    Products
-                </Title>
+            <Title order={3} mb="md" align="center">
+                Products
+            </Title>
 
-                <ScrollArea>
-                    <Table>
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Name</th>
-                                <th>Buying Price</th>
-                                <th>Selling Price</th>
-                                <th>Total Amount</th>
-                                <th>Control</th>
-                            </tr>
-                        </thead>
-                        <tbody>{rows}</tbody>
-                    </Table>
-                </ScrollArea>
-            </Container>
-        </>
+            <ScrollArea>
+                <Table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Buying Price</th>
+                            <th>Selling Price</th>
+                            <th>Total Amount</th>
+                            <th>Control</th>
+                        </tr>
+                    </thead>
+                    <tbody>{rows}</tbody>
+                </Table>
+            </ScrollArea>
+        </Container>
     );
 }
 

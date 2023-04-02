@@ -21,10 +21,10 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function ProductCard({ data, onOpenModal }: IProductCardProps) {
-    const { classes, theme } = useStyles();
+    const { classes } = useStyles();
 
     return (
-        <Card key={data._id} shadow="sm" padding="lg" radius="md" w={300} className={classes.card} withBorder>
+        <Card shadow="sm" padding="lg" radius="md" w={300} className={classes.card} withBorder>
             <Stack spacing={0}>
                 <Card.Section pl="md" pr="md">
                     <Image src={data.image} className={classes.cardImage} height={160} alt={data.name} fit="contain" />

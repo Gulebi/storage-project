@@ -1,15 +1,32 @@
 const { UserModel } = require("../Models.js");
 const { Router } = require("express");
+const { Types } = require("mongoose");
 
 const router = Router();
 
-router.get("/getById/:id", (req, res) => {
+router.get("/:id/info", async (req, res) => {
     try {
         res.set("Content-Type", "application/json");
 
         const { id } = req.params;
 
-        UserModel.findById(id).then(
+        const mRes = await UserModel.findById(id, { password: 0 });
+
+        return res.status(200).send({ message: "Success", data: mRes });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.put("/:id/addStorage", (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id } = req.params;
+        const { id: storageId, status } = req.body;
+
+        UserModel.findByIdAndUpdate(id, { $push: { storages: { _id: storageId, status } } }).then(
             (doc) => {
                 return res.status(200).send({ message: "Success", data: doc });
             },
@@ -23,21 +40,62 @@ router.get("/getById/:id", (req, res) => {
     }
 });
 
-router.put("/addStorage/:id", (req, res) => {
+router.get("/:id/getStorages", async (req, res) => {
     try {
         res.set("Content-Type", "application/json");
 
         const { id } = req.params;
-        const { id: storageId, status } = req.body;
 
-        UserModel.findByIdAndUpdate(id, { $push: { storages: { storageId, status } } }).then(
-            (doc) => {
-                return res.status(200).send({ message: "Success", data: doc });
+        const mRes = await UserModel.aggregate([
+            {
+                $match: {
+                    _id: new Types.ObjectId(id),
+                },
             },
-            () => {
-                return res.status(500).send({ message: "Error" });
-            }
-        );
+            {
+                $lookup: {
+                    from: "storages",
+                    localField: "storages._id",
+                    foreignField: "_id",
+                    as: "storagesDetails",
+                    pipeline: [
+                        {
+                            $project: {
+                                products: 0,
+                                totalMoneyHistory: 0,
+                                operationsHistory: 0,
+                            },
+                        },
+                    ],
+                },
+            },
+            {
+                $project: {
+                    name: 1,
+                    storages: {
+                        $map: {
+                            input: "$storages",
+                            as: "storage",
+                            in: {
+                                $mergeObjects: [
+                                    "$$storage",
+                                    {
+                                        $first: {
+                                            $filter: {
+                                                input: "$storagesDetails",
+                                                cond: { $eq: ["$$this._id", "$$storage._id"] },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        ]);
+
+        return res.status(200).send({ message: "Success", data: mRes[0]?.storages });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });

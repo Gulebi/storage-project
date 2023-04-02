@@ -101,7 +101,10 @@ function ProductsPage() {
     return (
         <Container size="lg" my="md">
             <Flex m="md" gap="md" justify="space-between">
-                {products && products.map((product) => <ProductCard data={product} onOpenModal={onOpenModal} />)}
+                {products &&
+                    products.map((product) => (
+                        <ProductCard key={product._id} data={product} onOpenModal={onOpenModal} />
+                    ))}
             </Flex>
 
             <Center>{products && <Pagination total={1}></Pagination>}</Center>
