@@ -1,48 +1,12 @@
 import apiClient from "../../common/api";
 import { modals } from "@mantine/modals";
-import { DashboardNavbar } from "../../components";
-import { AppShell, Button, Grid, Modal, NumberInput, Stack, TextInput } from "@mantine/core";
+import { ChangeBalanceModal, DashboardNavbar } from "../../components";
+import { AppShell } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { useForm } from "@mantine/form";
+import { IChangeBalanceFormValues } from "@/components/Modals/ChangeBalanceModal";
 
 const hideNavbarPages = ["/dashboard", "/dashboard/storage/create"];
-
-function ChangeBalanceModal({ onFormSubmit }: { onFormSubmit: (values: { balance: number }) => void }) {
-    const changeForm = useForm({
-        initialValues: {
-            balance: 1,
-        },
-
-        validate: {
-            balance: (val) => (val < 0 ? `balance >= 0` : null),
-        },
-    });
-
-    return (
-        <>
-            <Stack spacing="sm" align="center">
-                <form onSubmit={changeForm.onSubmit((values) => onFormSubmit(values))}>
-                    <Grid align="end">
-                        <Grid.Col span={8}>
-                            <NumberInput
-                                required
-                                placeholder="Amount"
-                                min={1}
-                                value={changeForm.values.balance}
-                                onChange={(value) => changeForm.setFieldValue("balance", value || 1)} // not working
-                                error={changeForm.errors.balance}
-                            />
-                        </Grid.Col>
-                        <Grid.Col span={4}>
-                            <Button type="submit">Change</Button>
-                        </Grid.Col>
-                    </Grid>
-                </form>
-            </Stack>
-        </>
-    );
-}
 
 function DashboardMainPage() {
     const location = useLocation();
@@ -58,8 +22,10 @@ function DashboardMainPage() {
                 if (!currentUserId) {
                     navigate("/login");
                 } else {
-                    const balanceRes = await apiClient.get(`/storages/${storageId}/getBalance`);
-                    setBalance(balanceRes.data.data.totalMoney);
+                    if (!hideNavbarPages.includes(location.pathname)) {
+                        const balanceRes = await apiClient.get(`/storages/${storageId}/getBalance`);
+                        setBalance(balanceRes.data.data.totalMoney);
+                    }
                 }
             } catch (error) {
                 console.log({ error });
@@ -81,7 +47,7 @@ function DashboardMainPage() {
         navigate("/login");
     };
 
-    const onChangeFormSubmit = (values: { balance: any }) => {
+    const onChangeFormSubmit = (values: IChangeBalanceFormValues) => {
         setBalance(values.balance);
         modals.closeAll();
     };

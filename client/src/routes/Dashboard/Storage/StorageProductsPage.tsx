@@ -1,22 +1,17 @@
 import { useEffect, useState } from "react";
-import {
-    Table,
-    ScrollArea,
-    Group,
-    Text,
-    Container,
-    Button,
-    Title,
-    LoadingOverlay,
-    NumberInput,
-    Stack,
-} from "@mantine/core";
+import { Table, ScrollArea, Group, Text, Container, Button, Title, LoadingOverlay, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IStorageProduct } from "../../../types";
 import apiClient from "../../../common/api";
 import { upperFirst, useDisclosure } from "@mantine/hooks";
 import { useNavigate, useParams } from "react-router-dom";
-import { useForm } from "@mantine/form";
+import { ChangeAmountModal, ChangePriceModal } from "../../../components";
+
+export interface IChangeFormProps {
+    value: number;
+    id: string;
+    field: string;
+}
 
 function DashboardProductsPage() {
     const [products, setProducts] = useState<IStorageProduct[]>([]);
@@ -25,36 +20,18 @@ function DashboardProductsPage() {
 
     const [visible, { open: openOverlay, close: closeOverlay }] = useDisclosure(false);
 
-    const changeForm = useForm({
-        initialValues: {
-            number: 1,
-        },
-    });
+    const openChangePriceModal = (data: IStorageProduct) => {
+        modals.open({
+            title: "Change product price",
+            children: <ChangePriceModal onFormSubmit={onChangeFormSubmit} data={data} />,
+        });
+    };
 
-    const ChangeModal = (data: IStorageProduct, field: keyof IStorageProduct) => {
-        return {
-            title: `Change ${upperFirst(field)} field`,
-            children: (
-                <>
-                    <form onSubmit={changeForm.onSubmit(({ number }) => onChangeFormSubmit(data._id, number, field))}>
-                        <Stack spacing="sm" align="center">
-                            <Text>{data.name}</Text>
-                            <Group>
-                                <NumberInput
-                                    placeholder="Change field"
-                                    min={0}
-                                    defaultValue={+data[field]}
-                                    // value={changeForm.values.number}
-                                    // onChange={(value) => changeForm.setFieldValue("number", value || 1)}
-                                    {...changeForm.getInputProps("number")}
-                                />
-                                <Button type="submit">Change</Button>
-                            </Group>
-                        </Stack>
-                    </form>
-                </>
-            ),
-        };
+    const openChangeAmountModal = (data: IStorageProduct) => {
+        modals.open({
+            title: "Change product amount",
+            children: <ChangeAmountModal onFormSubmit={onChangeFormSubmit} data={data} />,
+        });
     };
 
     const ConfirmModal = (data: IStorageProduct) => {
@@ -87,13 +64,7 @@ function DashboardProductsPage() {
             <td>
                 <Group spacing="xs">
                     {product.sellingPrice}
-                    <Button
-                        size="xs"
-                        compact
-                        onClick={() => {
-                            modals.open(ChangeModal(product, "sellingPrice"));
-                        }}
-                    >
+                    <Button size="xs" compact onClick={() => openChangePriceModal(product)}>
                         Change
                     </Button>
                 </Group>
@@ -101,13 +72,7 @@ function DashboardProductsPage() {
             <td>
                 <Group spacing="xs">
                     {product.totalAmount}
-                    <Button
-                        size="xs"
-                        compact
-                        onClick={() => {
-                            modals.open(ChangeModal(product, "totalAmount"));
-                        }}
-                    >
+                    <Button size="xs" compact onClick={() => openChangeAmountModal(product)}>
                         Change
                     </Button>
                 </Group>
@@ -142,12 +107,12 @@ function DashboardProductsPage() {
         loadProducts();
     };
 
-    const onChangeFormSubmit = (id: string, value: number, field: string) => {
+    const onChangeFormSubmit = ({ value, id, field }: IChangeFormProps) => {
         console.log(value);
 
-        // modals.closeAll();
-        // apiClient.post(`/storages/${storageId}/changeProduct${upperFirst(field)}`, { productId: id, newValue: value });
-        // loadProducts();
+        modals.closeAll();
+        apiClient.post(`/storages/${storageId}/changeProduct${upperFirst(field)}`, { productId: id, newValue: value });
+        loadProducts();
     };
 
     useEffect(() => {

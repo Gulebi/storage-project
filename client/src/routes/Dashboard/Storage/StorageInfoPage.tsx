@@ -2,17 +2,26 @@ import { useEffect } from "react";
 import apiClient from "../../../common/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
-import { Container, LoadingOverlay } from "@mantine/core";
+import { Container, Grid, LoadingOverlay, Title, createStyles } from "@mantine/core";
+
+const useStyles = createStyles((theme) => ({
+    grid: {},
+    column: {
+        border: "1px solid gray",
+    },
+}));
 
 function DashboardInfoPage() {
+    const { classes } = useStyles();
     const navigate = useNavigate();
     const { id: storageId } = useParams();
 
-    const [visible, { toggle }] = useDisclosure(true);
+    const [visible, { open: openOverlay, close: closeOverlay }] = useDisclosure(false);
 
     useEffect(() => {
         (async () => {
             try {
+                openOverlay();
                 const existsRes = await apiClient.get(`/storages/${storageId}/exists`);
 
                 if (!existsRes.data.data) {
@@ -22,7 +31,7 @@ function DashboardInfoPage() {
             } catch (error) {
                 console.log({ error });
             } finally {
-                toggle();
+                closeOverlay();
             }
         })();
     }, []);
@@ -30,7 +39,17 @@ function DashboardInfoPage() {
     return (
         <Container size="lg" h="100%" pos="relative">
             <LoadingOverlay visible={visible} overlayBlur={2} />
-            DashboardInfoPage
+
+            <Title order={3} mb="md" align="center">
+                Storage Info
+            </Title>
+
+            <Grid align="stretch">
+                <Grid.Col className={classes.column} span={8}></Grid.Col>
+                <Grid.Col className={classes.column} span={4}></Grid.Col>
+                <Grid.Col className={classes.column} span={8}></Grid.Col>
+                <Grid.Col className={classes.column} span={4}></Grid.Col>
+            </Grid>
         </Container>
     );
 }

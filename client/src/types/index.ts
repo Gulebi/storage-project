@@ -13,6 +13,11 @@ export interface IRouteError {
     statusText: string;
 }
 
+export interface IError {
+    message: string;
+    status: number;
+}
+
 export interface IProduct {
     _id: string;
     name: string;

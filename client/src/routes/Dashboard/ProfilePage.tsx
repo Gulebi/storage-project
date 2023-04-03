@@ -1,5 +1,7 @@
+import { Container } from "@mantine/core";
+
 function ProfilePage() {
-    return <div>ProfilePage</div>;
+    return <Container>ProfilePage</Container>;
 }
 
 export default ProfilePage;
