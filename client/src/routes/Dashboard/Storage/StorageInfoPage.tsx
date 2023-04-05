@@ -2,12 +2,13 @@ import { useEffect } from "react";
 import apiClient from "../../../common/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
-import { Container, Grid, LoadingOverlay, Title, createStyles } from "@mantine/core";
+import { Card, Container, Grid, Group, LoadingOverlay, Title, createStyles, Text, ScrollArea } from "@mantine/core";
+import { StorageInfoCard, BalanceHistoryChartCard, SmallInfoCard } from "../../../components";
 
 const useStyles = createStyles((theme) => ({
-    grid: {},
     column: {
-        border: "1px solid gray",
+        display: "flex",
+        flexDirection: "column",
     },
 }));
 
@@ -44,12 +45,31 @@ function DashboardInfoPage() {
                 Storage Info
             </Title>
 
-            <Grid align="stretch">
-                <Grid.Col className={classes.column} span={8}></Grid.Col>
-                <Grid.Col className={classes.column} span={4}></Grid.Col>
-                <Grid.Col className={classes.column} span={8}></Grid.Col>
-                <Grid.Col className={classes.column} span={4}></Grid.Col>
-            </Grid>
+            <ScrollArea offsetScrollbars>
+                <Grid align="stretch" mb="lg">
+                    <Grid.Col span={3}>
+                        <SmallInfoCard title="Balance" data={125} controls />
+                    </Grid.Col>
+                    <Grid.Col span={3}>
+                        <SmallInfoCard title="Total products" data={12} />
+                    </Grid.Col>
+                    <Grid.Col span={3}>
+                        <SmallInfoCard title="Total products bought" data={125} />
+                    </Grid.Col>
+                    <Grid.Col span={3}>
+                        <SmallInfoCard title="Total products sold" data={125} />
+                    </Grid.Col>
+                </Grid>
+
+                <Grid align="stretch">
+                    <Grid.Col span={8} className={classes.column}>
+                        <BalanceHistoryChartCard />
+                    </Grid.Col>
+                    <Grid.Col span={4} className={classes.column}>
+                        <StorageInfoCard />
+                    </Grid.Col>
+                </Grid>
+            </ScrollArea>
         </Container>
     );
 }

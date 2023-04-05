@@ -23,8 +23,7 @@ function DashboardMainPage() {
                     navigate("/login");
                 } else {
                     if (!hideNavbarPages.includes(location.pathname)) {
-                        const balanceRes = await apiClient.get(`/storages/${storageId}/getBalance`);
-                        setBalance(balanceRes.data.data.totalMoney);
+                        loadBalance();
                     }
                 }
             } catch (error) {
@@ -39,6 +38,11 @@ function DashboardMainPage() {
             title: "Change balance",
             children: <ChangeBalanceModal onFormSubmit={onChangeFormSubmit} />,
         });
+    };
+
+    const loadBalance = async () => {
+        const balanceRes = await apiClient.get(`/storages/${storageId}/getBalance`);
+        setBalance(balanceRes.data.data.totalMoney);
     };
 
     const onLogOut = () => {
@@ -57,7 +61,12 @@ function DashboardMainPage() {
             padding="md"
             navbar={
                 !hideNavbarPages.includes(location.pathname) ? (
-                    <DashboardNavbar balance={balance} onLogOut={onLogOut} onChangeBalance={openChangeBalanceModal} />
+                    <DashboardNavbar
+                        balance={balance}
+                        onLogOut={onLogOut}
+                        onLoadBalance={loadBalance}
+                        onChangeBalance={openChangeBalanceModal}
+                    />
                 ) : (
                     <div></div>
                 )

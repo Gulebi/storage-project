@@ -13,4 +13,3 @@ export { default as StorageProductsPage } from "./Dashboard/Storage/StorageProdu
 export { default as StorageHistoryPage } from "./Dashboard/Storage/StorageHistoryPage";
 export { default as StorageSalesPage } from "./Dashboard/Storage/StorageSalesPage";
 export { default as StorageInfoPage } from "./Dashboard/Storage/StorageInfoPage";
-export { default as StorageSettingsPage } from "./Dashboard/Storage/StorageSettingsPage";

@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
-import { Navbar, Group, Divider, NavLink, Code, Title, Button } from "@mantine/core";
-import { IconLogout, IconBuildingStore, IconUserCircle, IconBuildingWarehouse } from "@tabler/icons-react";
+import { Navbar, Group, Divider, NavLink, Code, Title, Button, ActionIcon } from "@mantine/core";
+import { IconLogout, IconBuildingStore, IconBuildingWarehouse, IconReload, IconEdit } from "@tabler/icons-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Logo, ProfileDrawer, UserButton } from "../components";
 import { useDisclosure } from "@mantine/hooks";
 
 interface IDashboardNavbarProps {
     onLogOut: () => void;
+    onLoadBalance: () => void;
     onChangeBalance: () => void;
     balance: number;
 }
 
-function DashboardNavbar({ onLogOut, onChangeBalance, balance }: IDashboardNavbarProps) {
+function DashboardNavbar({ onLogOut, onLoadBalance, onChangeBalance, balance }: IDashboardNavbarProps) {
     const location = useLocation();
     const navigate = useNavigate();
     const [active, setActive] = useState(location.pathname.split("/").at(2)!);
@@ -28,7 +29,6 @@ function DashboardNavbar({ onLogOut, onChangeBalance, balance }: IDashboardNavba
                 { link: `/dashboard/storage/${storageId}/sales`, label: "Sales" },
                 { link: `/dashboard/storage/${storageId}/history`, label: "History" },
                 { link: `/dashboard/storage/${storageId}/products`, label: "Products" },
-                { link: `/dashboard/storage/${storageId}/settings`, label: "Setting" },
             ],
             icon: IconBuildingWarehouse,
         },
@@ -85,16 +85,25 @@ function DashboardNavbar({ onLogOut, onChangeBalance, balance }: IDashboardNavba
 
                 <Divider my="sm" />
 
-                <Navbar.Section>
-                    <Group position="apart">
-                        <Title order={5}>{`Balance: ${balance}`}</Title>
-                        <Button compact onClick={onChangeBalance}>
-                            Change
-                        </Button>
-                    </Group>
-                </Navbar.Section>
+                {location.pathname !== `/dashboard/storage/${storageId}/info` && (
+                    <>
+                        <Navbar.Section>
+                            <Group position="apart">
+                                <Title order={5}>{`Balance: ${balance}`}</Title>
+                                <Group spacing="xs">
+                                    <ActionIcon variant="filled" color="blue" onClick={onChangeBalance}>
+                                        <IconEdit size="1.3rem" />
+                                    </ActionIcon>
+                                    <ActionIcon variant="filled" color="blue" onClick={onLoadBalance}>
+                                        <IconReload size="1.3rem" />
+                                    </ActionIcon>
+                                </Group>
+                            </Group>
+                        </Navbar.Section>
 
-                <Divider my="sm" />
+                        <Divider my="sm" />
+                    </>
+                )}
 
                 <Navbar.Section>
                     <NavLink label="Log out" icon={<IconLogout stroke={1.5} />} onClick={onLogOut} />

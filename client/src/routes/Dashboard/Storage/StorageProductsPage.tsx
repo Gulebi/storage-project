@@ -1,11 +1,23 @@
 import { useEffect, useState } from "react";
-import { Table, ScrollArea, Group, Text, Container, Button, Title, LoadingOverlay, Stack } from "@mantine/core";
+import {
+    Table,
+    ScrollArea,
+    Group,
+    Text,
+    Container,
+    Button,
+    Title,
+    LoadingOverlay,
+    Stack,
+    ActionIcon,
+} from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IStorageProduct } from "../../../types";
 import apiClient from "../../../common/api";
 import { upperFirst, useDisclosure } from "@mantine/hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import { ChangeAmountModal, ChangePriceModal } from "../../../components";
+import { IconEdit, IconTrash } from "@tabler/icons-react";
 
 export interface IChangeFormProps {
     value: number;
@@ -64,28 +76,29 @@ function DashboardProductsPage() {
             <td>
                 <Group spacing="xs">
                     {product.sellingPrice}
-                    <Button size="xs" compact onClick={() => openChangePriceModal(product)}>
-                        Change
-                    </Button>
+                    <ActionIcon color="blue" size="sm" variant="filled" onClick={() => openChangePriceModal(product)}>
+                        <IconEdit size="1rem" />
+                    </ActionIcon>
                 </Group>
             </td>
             <td>
                 <Group spacing="xs">
                     {product.totalAmount}
-                    <Button size="xs" compact onClick={() => openChangeAmountModal(product)}>
-                        Change
-                    </Button>
+                    <ActionIcon color="blue" size="sm" variant="filled" onClick={() => openChangeAmountModal(product)}>
+                        <IconEdit size="1rem" />
+                    </ActionIcon>
                 </Group>
             </td>
             <td>
-                <Button
-                    compact
+                <ActionIcon
+                    color="blue"
+                    variant="filled"
                     onClick={() => {
                         modals.open(ConfirmModal(product));
                     }}
                 >
-                    Delete
-                </Button>
+                    <IconTrash size="1.3rem" />
+                </ActionIcon>
             </td>
         </tr>
     ));

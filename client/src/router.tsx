@@ -10,7 +10,6 @@ import {
     StorageProductsPage,
     StorageHistoryPage,
     StorageSalesPage,
-    StorageSettingsPage,
     StorageInfoPage,
     StorageSelectionPage,
 } from "./routes";
@@ -37,10 +36,6 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard/storage/:id/products",
                 element: <StorageProductsPage />,
-            },
-            {
-                path: "/dashboard/storage/:id/settings",
-                element: <StorageSettingsPage />,
             },
             {
                 path: "/dashboard/storage/:id/history",
