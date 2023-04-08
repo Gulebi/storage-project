@@ -26,10 +26,9 @@ function DashboardSalesPage() {
     const [foundData, setFoundData] = useState<IStorageProduct>();
     const [sales, setSales] = useState<IStorageSaleProduct[]>([]);
     const [opened, { close, open }] = useDisclosure(false);
-    const navigate = useNavigate();
     const { id: storageId } = useParams();
 
-    const [visible, { toggle }] = useDisclosure(true);
+    const [visible, { open: openOverlay, close: closeOverlay }] = useDisclosure(false);
 
     const ref = useClickOutside(() => close());
 
@@ -134,23 +133,6 @@ function DashboardSalesPage() {
             ),
         };
     };
-
-    useEffect(() => {
-        (async () => {
-            try {
-                const existsRes = await apiClient.get(`/storages/${storageId}/exists`);
-
-                if (!existsRes.data.data) {
-                    navigate("/dashboard");
-                } else {
-                }
-            } catch (error) {
-                console.log({ error });
-            } finally {
-                toggle();
-            }
-        })();
-    }, []);
 
     return (
         <Container size="sm" h="100%" pos="relative">

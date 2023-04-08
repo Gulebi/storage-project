@@ -1,12 +1,15 @@
+import { IStorage } from "../types";
 import { Card, Divider, Title, Text, Group, Button, Stack, createStyles, ActionIcon } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 
-const useStyles = createStyles((theme) => ({
-    infoTitle: {},
-}));
+interface IStorageInfoCardProps {
+    data: IStorage;
+    isAdmin: boolean;
+}
 
-function AdminInfoCard() {
-    const { classes } = useStyles();
+function StorageInfoCard({ data, isAdmin }: IStorageInfoCardProps) {
+    // const currentUserId = localStorage.getItem("currentUserId");
+    // const isAdmin = currentUserId === data.adminId;
 
     return (
         <Card w="100%" shadow="sm" padding="xl" radius="md" withBorder>
@@ -20,11 +23,13 @@ function AdminInfoCard() {
                         <Title order={5} fz="lg">
                             Name
                         </Title>
-                        <Text fw={500}>Based</Text>
+                        <Text fw={500}>{data.name}</Text>
                     </div>
-                    <ActionIcon variant="filled" color="blue">
-                        <IconEdit size="1.3rem" />
-                    </ActionIcon>
+                    {isAdmin && (
+                        <ActionIcon variant="filled" color="blue">
+                            <IconEdit size="1.3rem" />
+                        </ActionIcon>
+                    )}
                 </Group>
             </Stack>
             <Divider my="sm" />
@@ -32,20 +37,24 @@ function AdminInfoCard() {
                 <Title order={5} fz="lg">
                     Creation Date
                 </Title>
-                <Text fw={500}>12.34.56</Text>
+                <Text fw={500}>{new Date(data.creationDate).toUTCString()}</Text>
             </Stack>
-            <Divider my="sm" />
-            <Stack spacing={0} ml={10}>
-                <Title order={5} fz="lg">
-                    Controls
-                </Title>
-                <Group mt={10}>
-                    <Button color="red">Change Admin</Button>
-                    <Button color="red">Delete</Button>
-                </Group>
-            </Stack>
+            {isAdmin && (
+                <>
+                    <Divider my="sm" />
+                    <Stack spacing={0} ml={10}>
+                        <Title order={5} fz="lg">
+                            Controls
+                        </Title>
+                        <Group mt={10}>
+                            <Button color="red">Change Admin</Button>
+                            <Button color="red">Delete</Button>
+                        </Group>
+                    </Stack>
+                </>
+            )}
         </Card>
     );
 }
 
-export default AdminInfoCard;
+export default StorageInfoCard;

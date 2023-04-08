@@ -5,6 +5,7 @@ const UserSchema = new Schema({
     email: String,
     username: String,
     password: String,
+    imageURL: String,
     storages: {
         type: [
             {
@@ -34,7 +35,7 @@ const StorageSchema = new Schema({
     products: {
         type: [
             {
-                code: { type: String, default: uid },
+                code: { type: String, default: () => uid() },
                 buyingPrice: Number,
                 buyingPriceHistory: { type: [Number], default: [] },
                 sellingPrice: Number,

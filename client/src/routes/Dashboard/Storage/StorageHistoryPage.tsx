@@ -6,37 +6,31 @@ import { useDisclosure } from "@mantine/hooks";
 import { useNavigate, useParams } from "react-router-dom";
 
 function DashboardHistoryPage() {
-    const [products, setProducts] = useState<IStorageOperation[]>([]);
-    const navigate = useNavigate();
+    const [operations, setOperations] = useState<IStorageOperation[]>([]);
     const { id: storageId } = useParams();
 
-    const [visible, { toggle }] = useDisclosure(true);
+    const [visible, { open: openOverlay, close: closeOverlay }] = useDisclosure(false);
 
-    const rows = products.map((product, index) => (
+    const rows = operations.map((operation, index) => (
         <tr key={index}>
-            <td>{product.name}</td>
-            <td>{product.operationName}</td>
-            <td>{(product?.amount || "").toString()}</td>
-            <td>{new Date(product.operationDate).toUTCString()}</td>
+            <td>{operation.name}</td>
+            <td>{operation.operationName}</td>
+            <td>{(operation?.amount || "").toString()}</td>
+            <td>{new Date(operation.operationDate).toUTCString()}</td>
         </tr>
     ));
 
     useEffect(() => {
         (async () => {
             try {
-                const existsRes = await apiClient.get(`/storages/${storageId}/exists`);
+                openOverlay();
+                const historyRes = await apiClient.get(`/storages/${storageId}/getOperationsHistory`);
 
-                if (!existsRes.data.data) {
-                    navigate("/dashboard");
-                } else {
-                    const historyRes = await apiClient.get(`/storages/${storageId}/getOperationsHistory`);
-
-                    setProducts(historyRes.data.data);
-                }
+                setOperations(historyRes.data.data);
             } catch (error) {
                 console.log({ error });
             } finally {
-                toggle();
+                closeOverlay();
             }
         })();
     }, []);

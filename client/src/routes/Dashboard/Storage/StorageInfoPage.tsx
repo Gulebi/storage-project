@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
 import { Card, Container, Grid, Group, LoadingOverlay, Title, createStyles, Text, ScrollArea } from "@mantine/core";
 import { StorageInfoCard, BalanceHistoryChartCard, SmallInfoCard } from "../../../components";
+import { useQuery } from "@tanstack/react-query";
+import { IStorage } from "@/types";
 
 const useStyles = createStyles((theme) => ({
     column: {
@@ -14,62 +16,71 @@ const useStyles = createStyles((theme) => ({
 
 function DashboardInfoPage() {
     const { classes } = useStyles();
-    const navigate = useNavigate();
     const { id: storageId } = useParams();
 
-    const [visible, { open: openOverlay, close: closeOverlay }] = useDisclosure(false);
+    // const [visible, { open: openOverlay, close: closeOverlay }] = useDisclosure(false);
 
-    useEffect(() => {
-        (async () => {
-            try {
-                openOverlay();
-                const existsRes = await apiClient.get(`/storages/${storageId}/exists`);
+    const {
+        isLoading,
+        isSuccess,
+        error,
+        data: storageData,
+    } = useQuery({
+        queryKey: ["storageData"],
+        queryFn: () => apiClient.get(`/storages/${storageId}/info`),
+        select: (data) => data.data.data as IStorage,
+    });
 
-                if (!existsRes.data.data) {
-                    navigate("/dashboard");
-                } else {
-                }
-            } catch (error) {
-                console.log({ error });
-            } finally {
-                closeOverlay();
-            }
-        })();
-    }, []);
+    const currentUserId = localStorage.getItem("currentUserId");
+    const isAdmin = currentUserId === storageData?.adminId;
 
     return (
         <Container size="lg" h="100%" pos="relative">
-            <LoadingOverlay visible={visible} overlayBlur={2} />
+            <LoadingOverlay visible={isLoading} overlayBlur={2} />
 
             <Title order={3} mb="md" align="center">
                 Storage Info
             </Title>
 
-            <ScrollArea offsetScrollbars>
-                <Grid align="stretch" mb="lg">
-                    <Grid.Col span={3}>
-                        <SmallInfoCard title="Balance" data={125} controls />
-                    </Grid.Col>
-                    <Grid.Col span={3}>
-                        <SmallInfoCard title="Total products" data={12} />
-                    </Grid.Col>
-                    <Grid.Col span={3}>
-                        <SmallInfoCard title="Total products bought" data={125} />
-                    </Grid.Col>
-                    <Grid.Col span={3}>
-                        <SmallInfoCard title="Total products sold" data={125} />
-                    </Grid.Col>
-                </Grid>
+            {isSuccess && (
+                <ScrollArea offsetScrollbars>
+                    <Grid mih={isAdmin ? 140 : 120} align="stretch" mb="lg">
+                        <Grid.Col span={3}>
+                            <SmallInfoCard title="Balance" data={storageData?.totalMoney} controls={isAdmin} />
+                        </Grid.Col>
+                        <Grid.Col span={3}>
+                            <SmallInfoCard title="Total products" data={storageData.products.length} />
+                        </Grid.Col>
+                        <Grid.Col span={3}>
+                            <SmallInfoCard
+                                title="Total products bought"
+                                data={
+                                    storageData.operationsHistory.filter((item) => item.operationName === "buying")
+                                        .length // fix
+                                }
+                            />
+                        </Grid.Col>
+                        <Grid.Col span={3}>
+                            <SmallInfoCard
+                                title="Total products sold"
+                                data={
+                                    storageData.operationsHistory.filter((item) => item.operationName === "selling")
+                                        .length // fix
+                                }
+                            />
+                        </Grid.Col>
+                    </Grid>
 
-                <Grid align="stretch">
-                    <Grid.Col span={8} className={classes.column}>
-                        <BalanceHistoryChartCard />
-                    </Grid.Col>
-                    <Grid.Col span={4} className={classes.column}>
-                        <StorageInfoCard />
-                    </Grid.Col>
-                </Grid>
-            </ScrollArea>
+                    <Grid align="stretch">
+                        <Grid.Col span={8} className={classes.column}>
+                            <BalanceHistoryChartCard />
+                        </Grid.Col>
+                        <Grid.Col span={4} className={classes.column}>
+                            <StorageInfoCard data={storageData!} isAdmin={isAdmin} />
+                        </Grid.Col>
+                    </Grid>
+                </ScrollArea>
+            )}
         </Container>
     );
 }

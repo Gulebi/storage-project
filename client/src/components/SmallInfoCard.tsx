@@ -21,7 +21,7 @@ function SmallInfoCard({ title, data, controls }: ISmallInfoCardProps) {
     const { classes } = useStyles();
 
     return (
-        <Card shadow="sm" padding="lg" h={140} radius="md" withBorder>
+        <Card h="100%" shadow="sm" padding="lg" radius="md" withBorder>
             <Stack justify="space-between" h="100%" spacing={0}>
                 <Stack spacing={0}>
                     <Title order={4} className={classes.dataTitle}>

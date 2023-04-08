@@ -4,18 +4,20 @@ import { IconLogout, IconBuildingStore, IconBuildingWarehouse, IconReload, IconE
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Logo, ProfileDrawer, UserButton } from "../components";
 import { useDisclosure } from "@mantine/hooks";
+import { IUser } from "../types";
 
 interface IDashboardNavbarProps {
     onLogOut: () => void;
     onLoadBalance: () => void;
     onChangeBalance: () => void;
     balance: number;
+    userInfo: IUser | undefined;
 }
 
-function DashboardNavbar({ onLogOut, onLoadBalance, onChangeBalance, balance }: IDashboardNavbarProps) {
+function DashboardNavbar({ onLogOut, onLoadBalance, onChangeBalance, balance, userInfo }: IDashboardNavbarProps) {
     const location = useLocation();
     const navigate = useNavigate();
-    const [active, setActive] = useState(location.pathname.split("/").at(2)!);
+    const [active, setActive] = useState(location.pathname.split("/").at(3)!);
     const { id: storageId } = useParams();
 
     const [drawerOpened, { open: drawerOpen, close: drawerClose }] = useDisclosure(false);
@@ -25,15 +27,19 @@ function DashboardNavbar({ onLogOut, onLoadBalance, onChangeBalance, balance }: 
             label: "Storage",
             codename: "storage",
             children: [
-                { link: `/dashboard/storage/${storageId}/info`, label: "Info" },
-                { link: `/dashboard/storage/${storageId}/sales`, label: "Sales" },
-                { link: `/dashboard/storage/${storageId}/history`, label: "History" },
-                { link: `/dashboard/storage/${storageId}/products`, label: "Products" },
+                { link: `/dashboard/${storageId}/storage/info`, label: "Storage Info" },
+                { link: `/dashboard/${storageId}/storage/sales`, label: "Storage Sales" },
+                { link: `/dashboard/${storageId}/storage/history`, label: "Storage History" },
+                { link: `/dashboard/${storageId}/storage/products`, label: "Storage Products" },
             ],
             icon: IconBuildingWarehouse,
         },
-        { link: "/dashboard/products", codename: "products", label: "Browse Products", icon: IconBuildingStore },
-        // { link: "/dashboard/profile", codename: "profile", label: "Profile", icon: IconUserCircle },
+        {
+            link: `/dashboard/${storageId}/products`,
+            codename: "products",
+            label: "Browse Products",
+            icon: IconBuildingStore,
+        },
     ];
 
     const links = data.map((item) => (
@@ -63,7 +69,7 @@ function DashboardNavbar({ onLogOut, onLoadBalance, onChangeBalance, balance }: 
 
     return (
         <>
-            <ProfileDrawer opened={drawerOpened} close={drawerClose} />
+            {userInfo && <ProfileDrawer opened={drawerOpened} close={drawerClose} data={userInfo} />}
 
             <Navbar width={{ sm: 300 }} p="md">
                 <Navbar.Section>
@@ -74,18 +80,22 @@ function DashboardNavbar({ onLogOut, onLoadBalance, onChangeBalance, balance }: 
 
                 <Navbar.Section grow>{links}</Navbar.Section>
 
+                {userInfo && (
+                    <>
+                        <Divider my="sm" />
+
+                        <UserButton
+                            image={userInfo.imageURL}
+                            name={userInfo.username}
+                            email={userInfo.email}
+                            onButtonClick={drawerOpen}
+                        />
+                    </>
+                )}
+
                 <Divider my="sm" />
 
-                <UserButton
-                    image="https://avatars.githubusercontent.com/u/75713653"
-                    name="Guleb"
-                    email="asd@mail.ru"
-                    onButtonClick={drawerOpen}
-                />
-
-                <Divider my="sm" />
-
-                {location.pathname !== `/dashboard/storage/${storageId}/info` && (
+                {location.pathname !== `/dashboard/${storageId}/storage/info` && (
                     <>
                         <Navbar.Section>
                             <Group position="apart">

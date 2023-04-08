@@ -66,9 +66,19 @@ export interface IStorageOperation extends IProduct {
 export interface IStorage {
     _id: string;
     name: string;
+    adminId: string;
     totalMoney: number;
     totalMoneyHistory: number[];
-    creationDate: Date;
+    creationDate: string;
     products: IStorageProductShort[];
     operationsHistory: IStorageOperationShort[];
+}
+
+export interface IUser {
+    _id: string;
+    email: string;
+    username: string;
+    password: string;
+    imageURL: string;
+    storages: { _id: string; status: "admin" | "user" }[];
 }

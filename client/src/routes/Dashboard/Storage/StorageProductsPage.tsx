@@ -27,7 +27,6 @@ export interface IChangeFormProps {
 
 function DashboardProductsPage() {
     const [products, setProducts] = useState<IStorageProduct[]>([]);
-    const navigate = useNavigate();
     const { id: storageId } = useParams();
 
     const [visible, { open: openOverlay, close: closeOverlay }] = useDisclosure(false);
@@ -46,26 +45,15 @@ function DashboardProductsPage() {
         });
     };
 
-    const ConfirmModal = (data: IStorageProduct) => {
-        return {
+    const openConfirmModal = (data: IStorageProduct) => {
+        modals.openConfirmModal({
             title: `Delete ${data.name} product`,
-            children: (
-                <>
-                    <Stack spacing="sm" align="center">
-                        <Text align="center">Are you sure you want to delete this product?</Text>
-                        <Button
-                            color="red"
-                            onClick={() => {
-                                modals.closeAll();
-                                onDelete(data._id);
-                            }}
-                        >
-                            Delete
-                        </Button>
-                    </Stack>
-                </>
-            ),
-        };
+            children: <Text align="center">Are you sure you want to delete this product?</Text>,
+            labels: { confirm: "Delete", cancel: "Cancel" },
+            confirmProps: { color: "red" },
+            onCancel: () => console.log("Cancel"),
+            onConfirm: () => onDelete(data._id),
+        });
     };
 
     const rows = products.map((product: IStorageProduct) => (
@@ -90,52 +78,34 @@ function DashboardProductsPage() {
                 </Group>
             </td>
             <td>
-                <ActionIcon
-                    color="blue"
-                    variant="filled"
-                    onClick={() => {
-                        modals.open(ConfirmModal(product));
-                    }}
-                >
+                <ActionIcon color="blue" variant="filled" onClick={() => openConfirmModal(product)}>
                     <IconTrash size="1.3rem" />
                 </ActionIcon>
             </td>
         </tr>
     ));
 
-    const loadProducts = async () => {
-        try {
-            openOverlay();
-            const productsRes = await apiClient.get(`/storages/${storageId}/getProducts`);
-            setProducts(productsRes.data.data);
-        } catch (error) {
-            console.log({ error });
-        } finally {
-            closeOverlay();
-        }
-    };
-
     const onDelete = (id: IStorageProduct["_id"]) => {
         apiClient.post(`/storages/${storageId}/deleteProduct`, { productId: id });
-        loadProducts();
+        setProducts(products.filter((item) => item._id !== id));
     };
 
     const onChangeFormSubmit = ({ value, id, field }: IChangeFormProps) => {
-        console.log(value);
-
         modals.closeAll();
         apiClient.post(`/storages/${storageId}/changeProduct${upperFirst(field)}`, { productId: id, newValue: value });
-        loadProducts();
+        setProducts(products.map((item) => (item._id === id ? { ...item, [field]: value } : item)));
     };
 
     useEffect(() => {
         (async () => {
-            const existsRes = await apiClient.get(`/storages/${storageId}/exists`);
-
-            if (!existsRes.data.data) {
-                navigate("/dashboard");
-            } else {
-                loadProducts();
+            try {
+                openOverlay();
+                const productsRes = await apiClient.get(`/storages/${storageId}/getProducts`);
+                setProducts(productsRes.data.data);
+            } catch (error) {
+                console.log({ error });
+            } finally {
+                closeOverlay();
             }
         })();
     }, []);

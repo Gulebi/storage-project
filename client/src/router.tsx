@@ -4,7 +4,6 @@ import {
     LoginPage,
     SignupPage,
     ProductsPage,
-    ProfilePage,
     ErrorPage,
     DashboardMainPage,
     StorageProductsPage,
@@ -26,28 +25,24 @@ const router = createBrowserRouter([
         children: [
             { index: true, element: <StorageSelectionPage /> },
             {
-                path: "/dashboard/storage/:id/info",
+                path: "/dashboard/:id/storage/info",
                 element: <StorageInfoPage />,
             },
             {
-                path: "/dashboard/storage/:id/sales",
+                path: "/dashboard/:id/storage/sales",
                 element: <StorageSalesPage />,
             },
             {
-                path: "/dashboard/storage/:id/products",
+                path: "/dashboard/:id/storage/products",
                 element: <StorageProductsPage />,
             },
             {
-                path: "/dashboard/storage/:id/history",
+                path: "/dashboard/:id/storage/history",
                 element: <StorageHistoryPage />,
             },
             {
-                path: "/dashboard/products",
+                path: "/dashboard/:id/products",
                 element: <ProductsPage />,
-            },
-            {
-                path: "/dashboard/profile",
-                element: <ProfilePage />,
             },
         ],
     },

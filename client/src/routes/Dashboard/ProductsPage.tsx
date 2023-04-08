@@ -1,113 +1,108 @@
 import apiClient from "../../common/api";
-import {
-    Card,
-    Image,
-    Text,
-    Button,
-    Container,
-    Pagination,
-    Center,
-    Flex,
-    createStyles,
-    Grid,
-    NumberInput,
-} from "@mantine/core";
+import { Container, Title, TextInput, Grid, Select } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { modals } from "@mantine/modals";
 import { IProduct } from "@/types";
-import { ProductCard } from "../../components";
-import { useForm } from "@mantine/form";
+import { DataTable, DataTableSortStatus } from "mantine-datatable";
+import { IconSearch } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { BuyProductModal } from "../../components";
+import { useDebouncedState } from "@mantine/hooks";
+import { useParams } from "react-router-dom";
 
-const useStyles = createStyles((theme) => ({
-    cardImage: {
-        background: "#ffffff",
-        borderRadius: theme.radius.md,
-    },
-}));
+export interface IBuyFormProps {
+    id: string;
+    price: number;
+    amount: number;
+}
 
 function ProductsPage() {
-    const [products, setProducts] = useState<IProduct[]>();
+    const [page, setPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState<string | null>("10");
+    const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({ columnAccessor: "name", direction: "asc" });
+    const [searchValue, setSearchValue] = useDebouncedState("", 200);
+    const { id: storageId } = useParams();
 
-    const { classes, theme } = useStyles();
-
-    useEffect(() => {
-        (async () => {
-            try {
-                const productsRes = await apiClient.get("/products");
-
-                setProducts(productsRes.data.data);
-            } catch (error) {
-                console.log({ error });
-            } finally {
-            }
-        })();
-    }, []);
-
-    const form = useForm({
-        initialValues: {
-            amount: 1,
-        },
+    const { isLoading, error, data } = useQuery({
+        queryKey: ["data", page, itemsPerPage, sortStatus, searchValue],
+        queryFn: () =>
+            apiClient.get(
+                `/products/?page=${page}&limit=${itemsPerPage}&sortField=${sortStatus.columnAccessor}&dir=${sortStatus.direction}&search=${searchValue}`
+            ),
+        select: (data) => data.data.data as { products: IProduct[]; count: number },
     });
 
-    const BuyModal = (data: IProduct) => {
-        return {
-            title: "Buy Product",
-            size: "auto",
-            children: (
-                <Card key={data._id} padding="lg" radius="md" w={300}>
-                    <Card.Section p="md">
-                        <Image
-                            src={data.image}
-                            className={classes.cardImage}
-                            p="xs"
-                            height={160}
-                            alt={data?.name}
-                            fit="contain"
-                        />
-                    </Card.Section>
-
-                    <Flex justify="space-between" gap={50} mt="md">
-                        <Text weight={500}>{data.name}</Text>
-                        <Text weight={500}>{data.manufacturerPrice + "$"}</Text>
-                    </Flex>
-                    <Text size="sm" mb="xs" color="dimmed">
-                        {data.category}
-                    </Text>
-                    <Text size="sm" mb="sm">
-                        {data.manufacturer}
-                    </Text>
-
-                    <form onSubmit={form.onSubmit((values) => console.log(values))}>
-                        <Grid align="end">
-                            <Grid.Col span={8}>
-                                <NumberInput defaultValue={1} min={1} placeholder="Amount" label="Amount" />
-                            </Grid.Col>
-                            <Grid.Col span={4}>
-                                <Button type="submit" fullWidth>
-                                    Buy
-                                </Button>
-                            </Grid.Col>
-                        </Grid>
-                    </form>
-                </Card>
-            ),
-        };
+    const onBuyFormSubmit = ({ id, price, amount }: IBuyFormProps) => {
+        modals.closeAll();
+        apiClient.post(`/storages/${storageId}/buyProduct`, { productId: id, buyingPrice: price, amount });
     };
 
     const onOpenModal = (data: IProduct) => {
-        modals.open(BuyModal(data));
+        modals.open({
+            title: "Buy Product",
+            size: "auto",
+            children: <BuyProductModal data={data} onFormSubmit={onBuyFormSubmit} />,
+        });
     };
 
     return (
         <Container size="lg" my="md">
-            <Flex m="md" gap="md" justify="space-between">
-                {products &&
-                    products.map((product) => (
-                        <ProductCard key={product._id} data={product} onOpenModal={onOpenModal} />
-                    ))}
-            </Flex>
+            <Title order={3} mb="md" align="center">
+                Products
+            </Title>
 
-            <Center>{products && <Pagination total={1}></Pagination>}</Center>
+            <Grid>
+                <Grid.Col span={10}>
+                    <TextInput
+                        label="Search products"
+                        placeholder="Search products "
+                        icon={<IconSearch size="1rem" />}
+                        mb="md"
+                        defaultValue={searchValue}
+                        onChange={(event) => setSearchValue(event.currentTarget.value)}
+                    />
+                </Grid.Col>
+                <Grid.Col span={2}>
+                    <Select
+                        label="Items per page"
+                        placeholder="Items per page"
+                        value={itemsPerPage}
+                        onChange={setItemsPerPage}
+                        data={[
+                            { value: "5", label: "5" },
+                            { value: "10", label: "10" },
+                            { value: "15", label: "15" },
+                            { value: "20", label: "20" },
+                        ]}
+                    />
+                </Grid.Col>
+            </Grid>
+
+            <DataTable
+                withBorder
+                borderRadius="sm"
+                withColumnBorders
+                highlightOnHover
+                fetching={isLoading}
+                mih={150}
+                records={data?.products}
+                columns={[
+                    { accessor: "name", width: "50%", sortable: true },
+                    { accessor: "manufacturerPrice", width: "10%", title: "Price", sortable: true },
+                    { accessor: "category", width: "20%", sortable: true },
+                    { accessor: "manufacturer", width: "20%", sortable: true },
+                ]}
+                noRecordsText="No products to show"
+                onRowClick={(product) => {
+                    onOpenModal(product);
+                }}
+                sortStatus={sortStatus}
+                onSortStatusChange={setSortStatus}
+                page={page}
+                onPageChange={setPage}
+                totalRecords={data?.count}
+                recordsPerPage={parseInt(itemsPerPage || "10")}
+            />
         </Container>
     );
 }

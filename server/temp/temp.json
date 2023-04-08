@@ -1,0 +1,22 @@
+{
+    "name": "Based",
+    "totalMoney": 125,
+    "totalMoneyHistory": [
+        {
+            "Balance": 0
+        },
+        {
+            "Balance": 123
+        },
+        {
+            "Balance": 125
+        }
+    ],
+    "productsCount": 5,
+    "operationsCount": {
+        "buying": 2,
+        "selling": 3,
+        "deleting": 4
+    },
+    "creationDate": "12.12.12"
+}

@@ -19,6 +19,52 @@ router.post("/create", async (req, res) => {
     }
 });
 
+router.get("/:id/info", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id } = req.params;
+
+        const mRes = await StorageModel.findById(id);
+
+        return res.status(200).send({ message: "Success", data: mRes });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.get("/:id/stats", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id } = req.params;
+
+        const mRes = await StorageModel.aggregate([
+            {
+                $match: {
+                    _id: new Types.ObjectId(id),
+                },
+            },
+            // {
+            //     $project: {
+            //         name: 1,
+            //         totalMoney: 1,
+            //         // totalMoneyHistory: {},
+            //         productsCount: {$sum: },
+            //         // operationsCount: {},
+            //         creationDate: 1,
+            //     },
+            // },
+        ]);
+
+        return res.status(200).send({ message: "Success", data: mRes });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
 router.get("/:id/exists", async (req, res) => {
     try {
         res.set("Content-Type", "application/json");
@@ -221,7 +267,7 @@ router.post("/:id/buyProduct", async (req, res) => {
         );
 
         if (!mRes[0]?.products) {
-            const sellingPrice = buyingPrice + buyingPrice / 10;
+            const sellingPrice = (buyingPrice + buyingPrice / 10).toFixed(2);
 
             await StorageModel.findByIdAndUpdate(storageId, {
                 $push: {
@@ -293,7 +339,7 @@ router.post("/:id/deleteProduct", async (req, res) => {
 
         await StorageModel.findByIdAndUpdate(storageId, { $pull: { products: { _id: productId } } });
         await StorageModel.findByIdAndUpdate(storageId, {
-            $push: { operationsHistory: { productId, operationName } },
+            $push: { operationsHistory: { productId, operationName: "deleting" } },
         });
 
         return res.status(200).send({ message: "Success" });

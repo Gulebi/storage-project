@@ -15,7 +15,7 @@ interface IStorageCreateCardProps {
     onFormSubmit: (values: { name: string }) => void;
 }
 
-function StorageCreateCard({ onFormSubmit }: IStorageCreateCardProps) {
+function StorageCreateModal({ onFormSubmit }: IStorageCreateCardProps) {
     const { classes } = useStyles();
 
     const form = useForm({
@@ -47,4 +47,4 @@ function StorageCreateCard({ onFormSubmit }: IStorageCreateCardProps) {
     );
 }
 
-export default StorageCreateCard;
+export default StorageCreateModal;

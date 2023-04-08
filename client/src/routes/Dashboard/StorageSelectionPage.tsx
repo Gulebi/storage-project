@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StorageCard, StorageCreateCard } from "../../components";
+import { StorageCard, StorageCreateModal } from "../../components";
 import { Button, Center, Container, Divider, Flex, Group, Text, Title } from "@mantine/core";
 import apiClient from "../../common/api";
 import { modals } from "@mantine/modals";
@@ -31,8 +31,7 @@ function StorageSelectionPage() {
     };
 
     const onStorageSelect = async (id: string) => {
-        console.log(id);
-        navigate(`/dashboard/storage/${id}/info`);
+        navigate(`/dashboard/${id}/storage/info`);
     };
 
     const CreateModal = () => {
@@ -42,7 +41,7 @@ function StorageSelectionPage() {
             children: (
                 <>
                     <Center>
-                        <StorageCreateCard onFormSubmit={onStorageCreate} />
+                        <StorageCreateModal onFormSubmit={onStorageCreate} />
                     </Center>
                 </>
             ),
