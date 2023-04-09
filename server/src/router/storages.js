@@ -46,19 +46,53 @@ router.get("/:id/stats", async (req, res) => {
                     _id: new Types.ObjectId(id),
                 },
             },
-            // {
-            //     $project: {
-            //         name: 1,
-            //         totalMoney: 1,
-            //         // totalMoneyHistory: {},
-            //         productsCount: {$sum: },
-            //         // operationsCount: {},
-            //         creationDate: 1,
-            //     },
-            // },
+            {
+                $project: {
+                    name: 1,
+                    adminId: 1,
+                    totalMoney: 1,
+                    totalMoneyHistory: {
+                        $map: {
+                            input: "$totalMoneyHistory",
+                            as: "balance",
+                            in: { Balance: "$$balance.value" },
+                        },
+                    },
+                    productsCount: { $size: "$products" },
+                    creationDate: 1,
+                    operationsCount: {
+                        buying: {
+                            $reduce: {
+                                input: "$operationsHistory",
+                                initialValue: 0,
+                                in: {
+                                    $cond: {
+                                        if: { $eq: ["$$this.operationName", "buying"] },
+                                        then: { $add: ["$$value", "$$this.amount"] },
+                                        else: "$$value",
+                                    },
+                                },
+                            },
+                        },
+                        selling: {
+                            $reduce: {
+                                input: "$operationsHistory",
+                                initialValue: 0,
+                                in: {
+                                    $cond: {
+                                        if: { $eq: ["$$this.operationName", "selling"] },
+                                        then: { $add: ["$$value", "$$this.amount"] },
+                                        else: "$$value",
+                                    },
+                                },
+                            },
+                        },
+                    }, // optimize
+                },
+            },
         ]);
 
-        return res.status(200).send({ message: "Success", data: mRes });
+        return res.status(200).send({ message: "Success", data: mRes[0] });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });
@@ -178,6 +212,10 @@ router.post("/:id/setBalance", async (req, res) => {
         const { balance } = req.body;
 
         await StorageModel.findByIdAndUpdate(id, { totalMoney: balance });
+
+        await StorageModel.findByIdAndUpdate(id, {
+            $push: { totalMoneyHistory: { _id: new Types.ObjectId(id), value: balance } },
+        });
 
         return res.status(201).send({ message: "Success" });
     } catch (error) {
@@ -339,7 +377,7 @@ router.post("/:id/deleteProduct", async (req, res) => {
 
         await StorageModel.findByIdAndUpdate(storageId, { $pull: { products: { _id: productId } } });
         await StorageModel.findByIdAndUpdate(storageId, {
-            $push: { operationsHistory: { productId, operationName: "deleting" } },
+            $push: { operationsHistory: { _id: productId, operationName: "deleting" } },
         });
 
         return res.status(200).send({ message: "Success" });
@@ -398,6 +436,8 @@ router.get("/:id/getOperationsHistory", async (req, res) => {
 
         const { id } = req.params;
 
+        const { page = 1, limit = 10, sortField = "name", dir = "asc", search = "" } = req.query;
+
         const mRes = await StorageModel.aggregate([
             {
                 $match: {
@@ -415,7 +455,7 @@ router.get("/:id/getOperationsHistory", async (req, res) => {
             {
                 $project: {
                     name: 1,
-                    operationsHistory: {
+                    operations: {
                         $map: {
                             input: "$operationsHistory",
                             as: "operation",
@@ -434,11 +474,12 @@ router.get("/:id/getOperationsHistory", async (req, res) => {
                             },
                         },
                     },
+                    count: { $size: "$operationsHistory" },
                 },
             },
         ]);
 
-        return res.status(200).send({ message: "Success", data: mRes[0]?.operationsHistory });
+        return res.status(200).send({ message: "Success", data: mRes[0] });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });

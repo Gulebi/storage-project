@@ -4,3 +4,5 @@ https://ui.mantine.dev/
 https://recharts.org/
 https://www.chartjs.org/
 https://www.mockaroo.com/
+https://icflorescu.github.io/mantine-datatable/
+https://tanstack.com/query/latest

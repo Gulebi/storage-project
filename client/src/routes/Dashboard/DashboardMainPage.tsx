@@ -81,9 +81,10 @@ function DashboardMainPage() {
         navigate("/login");
     };
 
-    const onChangeFormSubmit = (values: IChangeBalanceFormValues) => {
-        setBalance(values.balance);
+    const onChangeFormSubmit = async (values: IChangeBalanceFormValues) => {
         modals.closeAll();
+        setBalance(values.balance);
+        await apiClient.post(`/storages/${storageId}/setBalance`, { balance: values.balance });
     };
 
     return (

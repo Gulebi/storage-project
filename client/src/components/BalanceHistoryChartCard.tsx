@@ -1,31 +1,12 @@
+import { IStorageStats } from "@/types";
 import { Card, Title } from "@mantine/core";
 import { LineChart, CartesianGrid, Legend, Line, Tooltip, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
-const data = [
-    {
-        Balance: 4000,
-    },
-    {
-        Balance: 3000,
-    },
-    {
-        Balance: 2000,
-    },
-    {
-        Balance: 2780,
-    },
-    {
-        Balance: 1890,
-    },
-    {
-        Balance: 2390,
-    },
-    {
-        Balance: 3490,
-    },
-];
+interface IBalanceHistoryChartCardProps {
+    data: IStorageStats["totalMoneyHistory"];
+}
 
-function BalanceHistoryChartCard() {
+function BalanceHistoryChartCard({ data }: IBalanceHistoryChartCardProps) {
     return (
         <Card w="100%" shadow="sm" padding="xl" radius="md" withBorder>
             <Title order={4} align="center" mb={15}>

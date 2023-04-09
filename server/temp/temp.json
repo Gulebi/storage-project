@@ -1,22 +1,63 @@
-{
-    "name": "Based",
-    "totalMoney": 125,
-    "totalMoneyHistory": [
-        {
-            "Balance": 0
-        },
-        {
-            "Balance": 123
-        },
-        {
-            "Balance": 125
-        }
-    ],
-    "productsCount": 5,
-    "operationsCount": {
-        "buying": 2,
-        "selling": 3,
-        "deleting": 4
+[
+    {
+        "_id": "641364bf9cb7c37fab3b1f8f",
+        "name": "Based",
+        "totalMoney": 125,
+        "totalMoneyHistory": [
+            {
+                "value": 0
+            },
+            {
+                "value": 102
+            },
+            {
+                "value": 125
+            }
+        ],
+        "products": [
+            {
+                "code": "ey03e3"
+            },
+            {
+                "code": "6mu1eg"
+            }
+        ],
+        "operationsHistory": [
+            {
+                "operationName": "selling",
+                "amount": 12
+            },
+            {
+                "operationName": "buying",
+                "amount": 4
+            },
+            {
+                "operationName": "buying",
+                "amount": 2
+            },
+            {
+                "operationName": "deleting"
+            }
+        ]
     },
-    "creationDate": "12.12.12"
-}
+    {
+        "name": "Based",
+        "totalMoney": 125,
+        "totalMoneyHistory": [
+            {
+                "Balance": 0
+            },
+            {
+                "Balance": 123
+            },
+            {
+                "Balance": 125
+            }
+        ],
+        "productsCount": 5,
+        "operationsCount": {
+            "buying": 6,
+            "selling": 12
+        }
+    }
+]

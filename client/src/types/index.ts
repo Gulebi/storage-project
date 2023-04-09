@@ -82,3 +82,19 @@ export interface IUser {
     imageURL: string;
     storages: { _id: string; status: "admin" | "user" }[];
 }
+
+export interface IStorageStats {
+    _id: string;
+    name: string;
+    adminId: string;
+    totalMoney: number;
+    totalMoneyHistory: {
+        Balance: number;
+    }[];
+    productsCount: number;
+    operationsCount: {
+        buying: number;
+        selling: number;
+    };
+    creationDate: string;
+}

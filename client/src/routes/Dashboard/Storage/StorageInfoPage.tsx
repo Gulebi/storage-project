@@ -5,7 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { Card, Container, Grid, Group, LoadingOverlay, Title, createStyles, Text, ScrollArea } from "@mantine/core";
 import { StorageInfoCard, BalanceHistoryChartCard, SmallInfoCard } from "../../../components";
 import { useQuery } from "@tanstack/react-query";
-import { IStorage } from "@/types";
+import { IStorage, IStorageStats } from "../../../types";
 
 const useStyles = createStyles((theme) => ({
     column: {
@@ -24,15 +24,15 @@ function DashboardInfoPage() {
         isLoading,
         isSuccess,
         error,
-        data: storageData,
+        data: storageStats,
     } = useQuery({
         queryKey: ["storageData"],
-        queryFn: () => apiClient.get(`/storages/${storageId}/info`),
-        select: (data) => data.data.data as IStorage,
+        queryFn: () => apiClient.get(`/storages/${storageId}/stats`),
+        select: (data) => data.data.data as IStorageStats,
     });
 
     const currentUserId = localStorage.getItem("currentUserId");
-    const isAdmin = currentUserId === storageData?.adminId;
+    const isAdmin = currentUserId === storageStats?.adminId;
 
     return (
         <Container size="lg" h="100%" pos="relative">
@@ -46,37 +46,25 @@ function DashboardInfoPage() {
                 <ScrollArea offsetScrollbars>
                     <Grid mih={isAdmin ? 140 : 120} align="stretch" mb="lg">
                         <Grid.Col span={3}>
-                            <SmallInfoCard title="Balance" data={storageData?.totalMoney} controls={isAdmin} />
+                            <SmallInfoCard title="Balance" data={storageStats?.totalMoney} controls={isAdmin} />
                         </Grid.Col>
                         <Grid.Col span={3}>
-                            <SmallInfoCard title="Total products" data={storageData.products.length} />
+                            <SmallInfoCard title="Total products" data={storageStats?.productsCount} />
                         </Grid.Col>
                         <Grid.Col span={3}>
-                            <SmallInfoCard
-                                title="Total products bought"
-                                data={
-                                    storageData.operationsHistory.filter((item) => item.operationName === "buying")
-                                        .length // fix
-                                }
-                            />
+                            <SmallInfoCard title="Total products bought" data={storageStats.operationsCount.buying} />
                         </Grid.Col>
                         <Grid.Col span={3}>
-                            <SmallInfoCard
-                                title="Total products sold"
-                                data={
-                                    storageData.operationsHistory.filter((item) => item.operationName === "selling")
-                                        .length // fix
-                                }
-                            />
+                            <SmallInfoCard title="Total products sold" data={storageStats.operationsCount.selling} />
                         </Grid.Col>
                     </Grid>
 
                     <Grid align="stretch">
                         <Grid.Col span={8} className={classes.column}>
-                            <BalanceHistoryChartCard />
+                            <BalanceHistoryChartCard data={storageStats?.totalMoneyHistory} />
                         </Grid.Col>
                         <Grid.Col span={4} className={classes.column}>
-                            <StorageInfoCard data={storageData!} isAdmin={isAdmin} />
+                            <StorageInfoCard data={storageStats!} isAdmin={isAdmin} />
                         </Grid.Col>
                     </Grid>
                 </ScrollArea>

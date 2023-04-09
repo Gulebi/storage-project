@@ -1,16 +1,13 @@
-import { IStorage } from "../types";
+import { IStorage, IStorageStats } from "../types";
 import { Card, Divider, Title, Text, Group, Button, Stack, createStyles, ActionIcon } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 
 interface IStorageInfoCardProps {
-    data: IStorage;
+    data: IStorageStats;
     isAdmin: boolean;
 }
 
 function StorageInfoCard({ data, isAdmin }: IStorageInfoCardProps) {
-    // const currentUserId = localStorage.getItem("currentUserId");
-    // const isAdmin = currentUserId === data.adminId;
-
     return (
         <Card w="100%" shadow="sm" padding="xl" radius="md" withBorder>
             <Title order={4} align="center">

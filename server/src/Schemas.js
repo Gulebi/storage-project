@@ -31,7 +31,15 @@ const StorageSchema = new Schema({
     adminId: String,
     creationDate: { type: Date, default: Date.now },
     totalMoney: { type: Number, default: 0 },
-    totalMoneyHistory: { type: [Number], default: [0] },
+    totalMoneyHistory: {
+        type: [
+            {
+                value: Number,
+                date: { type: Date, default: Date.now },
+            },
+        ],
+        default: [],
+    },
     products: {
         type: [
             {
