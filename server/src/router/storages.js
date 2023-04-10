@@ -61,33 +61,27 @@ router.get("/:id/stats", async (req, res) => {
                     productsCount: { $size: "$products" },
                     creationDate: 1,
                     operationsCount: {
-                        buying: {
-                            $reduce: {
-                                input: "$operationsHistory",
-                                initialValue: 0,
-                                in: {
+                        $reduce: {
+                            input: "$operationsHistory",
+                            initialValue: { buying: 0, selling: 0 },
+                            in: {
+                                buying: {
                                     $cond: {
                                         if: { $eq: ["$$this.operationName", "buying"] },
-                                        then: { $add: ["$$value", "$$this.amount"] },
-                                        else: "$$value",
+                                        then: { $add: ["$$value.buying", "$$this.amount"] },
+                                        else: "$$value.buying",
                                     },
                                 },
-                            },
-                        },
-                        selling: {
-                            $reduce: {
-                                input: "$operationsHistory",
-                                initialValue: 0,
-                                in: {
+                                selling: {
                                     $cond: {
                                         if: { $eq: ["$$this.operationName", "selling"] },
-                                        then: { $add: ["$$value", "$$this.amount"] },
-                                        else: "$$value",
+                                        then: { $add: ["$$value.selling", "$$this.amount"] },
+                                        else: "$$value.selling",
                                     },
                                 },
                             },
                         },
-                    }, // optimize
+                    },
                 },
             },
         ]);
