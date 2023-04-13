@@ -1,6 +1,6 @@
 import { useForm } from "@mantine/form";
 import { TextInput, PasswordInput, Text, Paper, Group, Button, Anchor, Stack, Box, rem } from "@mantine/core";
-import { IAuthValues } from "@/types";
+import { IAuthValues } from "../../types";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../common/api";
 

@@ -1,4 +1,4 @@
-import { IStorageStats } from "@/types";
+import { IStorageStats } from "../types";
 import { Card, Title } from "@mantine/core";
 import { LineChart, CartesianGrid, Legend, Line, Tooltip, XAxis, YAxis, ResponsiveContainer } from "recharts";
 

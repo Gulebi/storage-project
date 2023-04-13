@@ -5,10 +5,16 @@ export interface IChangeBalanceFormValues {
     balance: number;
 }
 
-function ChangeBalanceModal({ onFormSubmit }: { onFormSubmit: (values: IChangeBalanceFormValues) => void }) {
+function ChangeBalanceModal({
+    onFormSubmit,
+    defaultValue,
+}: {
+    onFormSubmit: (values: IChangeBalanceFormValues) => void;
+    defaultValue?: number;
+}) {
     const form = useForm<IChangeBalanceFormValues>({
         initialValues: {
-            balance: 1,
+            balance: defaultValue || 1,
         },
 
         validate: {

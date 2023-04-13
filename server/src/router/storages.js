@@ -1,6 +1,7 @@
 const { StorageModel } = require("../Models");
 const { Router } = require("express");
 const { Types, isValidObjectId } = require("mongoose");
+const { dirConversion } = require("../utils");
 
 const router = Router();
 
@@ -136,6 +137,8 @@ router.get("/:id/getProducts", async (req, res) => {
 
         const { id } = req.params;
 
+        const { page = 1, limit = 10, sortField = "name", dir = "asc", search = "" } = req.query;
+
         const mRes = await StorageModel.aggregate([
             {
                 $match: {
@@ -148,35 +151,46 @@ router.get("/:id/getProducts", async (req, res) => {
                     localField: "products._id",
                     foreignField: "_id",
                     as: "productsDetails",
+                    pipeline: [
+                        { $match: { name: { $regex: search } } },
+                        { $limit: limit * 1 },
+                        { $skip: (page - 1) * limit },
+                    ],
                 },
             },
             {
                 $project: {
                     name: 1,
                     products: {
-                        $map: {
-                            input: "$products",
-                            as: "product",
-                            in: {
-                                $mergeObjects: [
-                                    "$$product",
-                                    {
-                                        $first: {
-                                            $filter: {
-                                                input: "$productsDetails",
-                                                cond: { $eq: ["$$this._id", "$$product._id"] },
+                        $sortArray: {
+                            input: {
+                                $map: {
+                                    input: "$productsDetails",
+                                    as: "productDetails",
+                                    in: {
+                                        $mergeObjects: [
+                                            "$$productDetails",
+                                            {
+                                                $first: {
+                                                    $filter: {
+                                                        input: "$products",
+                                                        cond: { $eq: ["$$this._id", "$$productDetails._id"] },
+                                                    },
+                                                },
                                             },
-                                        },
+                                        ],
                                     },
-                                ],
+                                },
                             },
+                            sortBy: { [sortField]: dirConversion(dir) },
                         },
                     },
+                    count: { $size: "$productsDetails" },
                 },
             },
         ]);
 
-        return res.status(200).send({ message: "Success", data: mRes[0]?.products });
+        return res.status(200).send({ message: "Success", data: mRes[0] });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });

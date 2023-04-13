@@ -15,9 +15,11 @@ interface ISmallInfoCardProps {
     title: string;
     data: string | number;
     controls?: boolean;
+    onActionChange?: () => void;
+    onActionReload?: () => void;
 }
 
-function SmallInfoCard({ title, data, controls }: ISmallInfoCardProps) {
+function SmallInfoCard({ title, data, controls, onActionChange, onActionReload }: ISmallInfoCardProps) {
     const { classes } = useStyles();
 
     return (
@@ -31,10 +33,10 @@ function SmallInfoCard({ title, data, controls }: ISmallInfoCardProps) {
                 </Stack>
                 {controls && (
                     <Group spacing="sm">
-                        <ActionIcon variant="filled" color="blue">
+                        <ActionIcon variant="filled" color="blue" onClick={onActionChange}>
                             <IconEdit size="1.3rem" />
                         </ActionIcon>
-                        <ActionIcon variant="filled" color="blue">
+                        <ActionIcon variant="filled" color="blue" onClick={onActionReload}>
                             <IconReload size="1.3rem" />
                         </ActionIcon>
                     </Group>

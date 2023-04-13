@@ -127,6 +127,7 @@ function MainPage() {
                                     size="md"
                                     leftIcon={<IconExternalLink size="1rem" />}
                                     component="a"
+                                    target="_blank"
                                     href="https://github.com/Gulebi/storage-project"
                                 >
                                     Source code

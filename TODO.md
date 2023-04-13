@@ -1,6 +1,6 @@
 # TODO.md
 
-This is a todo list and a list of issues for the "StorageMaster" project.
+This is a todo list and a list of issues for the "StorageMaster" project (not all here)
 
 ### Todo
 
@@ -23,14 +23,15 @@ This is a todo list and a list of issues for the "StorageMaster" project.
     -   [x] Модалка создания storage`а
 -   [x] Дравер профиля
 -   [x] Кнопка "Log out"
--   [ ] Пагинация, поиск и сортировка на страницах с товарами
-    -   [ ] На странице с товарами магазина
+-   [x] Пагинация, поиск и сортировка на страницах
+    -   [ ] На странице с операциями
+    -   [x] На странице с товарами магазина
     -   [x] На странице со всеми товарами
 -   [ ] Нотификации
 
 #### Server
 
--   [ ] Optimize code in "storages.js" file on line 90
+-   [x] Optimize code in "storages.js" file on line 90
 
 ### Issues
 

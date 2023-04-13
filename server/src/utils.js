@@ -4,4 +4,9 @@ const uid = (len = 6) => {
         .substring(2, len + 2);
 };
 
-module.exports = { uid };
+const dirConversion = (dir) => {
+    if (dir === "asc") return 1;
+    else if (dir === "desc") return -1;
+};
+
+module.exports = { uid, dirConversion };

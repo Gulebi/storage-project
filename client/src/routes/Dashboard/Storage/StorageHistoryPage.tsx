@@ -1,5 +1,5 @@
 import apiClient from "../../../common/api";
-import { IStorageOperation } from "@/types";
+import { IStorageOperation } from "../../../types";
 import { Container, LoadingOverlay, ScrollArea, Table, Title } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { DataTable, DataTableSortStatus } from "mantine-datatable";
@@ -82,6 +82,7 @@ function DashboardHistoryPage() {
                     onPageChange={setPage}
                     totalRecords={data?.count}
                     recordsPerPage={parseInt(itemsPerPage || "10")}
+                    idAccessor="_id"
                 />
             </ScrollArea>
         </Container>

@@ -1,5 +1,5 @@
 import { createStyles, Title, Text, Button, Container, Group, rem } from "@mantine/core";
-import { IRouteError } from "@/types";
+import { IRouteError } from "../types";
 import { useNavigate, useRouteError } from "react-router-dom";
 
 function ErrorPage() {

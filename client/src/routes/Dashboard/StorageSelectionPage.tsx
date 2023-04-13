@@ -3,7 +3,7 @@ import { StorageCard, StorageCreateModal } from "../../components";
 import { Button, Center, Container, Divider, Flex, Group, Text, Title } from "@mantine/core";
 import apiClient from "../../common/api";
 import { modals } from "@mantine/modals";
-import { IStorage } from "@/types";
+import { IStorage } from "../../types";
 import { useNavigate } from "react-router-dom";
 
 function StorageSelectionPage() {

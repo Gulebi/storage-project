@@ -10,7 +10,7 @@ interface IDashboardNavbarProps {
     onLogOut: () => void;
     onLoadBalance: () => void;
     onChangeBalance: () => void;
-    balance: number;
+    balance: number | undefined;
     userInfo: IUser | undefined;
 }
 
@@ -95,7 +95,7 @@ function DashboardNavbar({ onLogOut, onLoadBalance, onChangeBalance, balance, us
 
                 <Divider my="sm" />
 
-                {location.pathname !== `/dashboard/${storageId}/storage/info` && (
+                {location.pathname !== `/dashboard/${storageId}/storage/info` && balance && (
                     <>
                         <Navbar.Section>
                             <Group position="apart">

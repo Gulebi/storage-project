@@ -2,7 +2,7 @@ import apiClient from "../../common/api";
 import { Container, Title, TextInput, Grid, Select } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { modals } from "@mantine/modals";
-import { IProduct } from "@/types";
+import { IProduct } from "../../types";
 import { DataTable, DataTableSortStatus } from "mantine-datatable";
 import { IconSearch } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
@@ -102,6 +102,7 @@ function ProductsPage() {
                 onPageChange={setPage}
                 totalRecords={data?.count}
                 recordsPerPage={parseInt(itemsPerPage || "10")}
+                idAccessor="_id"
             />
         </Container>
     );

@@ -1,4 +1,4 @@
-import { IChangeFormProps } from "@/routes/Dashboard/Storage/StorageProductsPage";
+import { IChangeFormProps } from "../../routes/Dashboard/Storage/StorageProductsPage";
 import { IStorageProduct } from "../../types";
 import { Button, Grid, Group, NumberInput, Stack, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -31,7 +31,7 @@ function ChangeAmountModal({ onFormSubmit, data }: IChangeAmountModalProps) {
                 )}
             >
                 <Stack spacing="sm" align="center">
-                    <Text>{data.name}</Text>
+                    <Text align="center">{data.name}</Text>
                     <Grid align="end">
                         <Grid.Col span={8}>
                             <NumberInput

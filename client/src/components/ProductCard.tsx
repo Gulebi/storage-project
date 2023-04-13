@@ -1,4 +1,4 @@
-import { IProduct } from "@/types";
+import { IProduct } from "../types";
 import { Card, Image, Flex, Text, Group, Button, createStyles, Stack } from "@mantine/core";
 
 interface IProductCardProps {
