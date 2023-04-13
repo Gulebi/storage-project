@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "../common/api";
-import { IStorageSaleProduct, IStorageStats } from "../types";
+import { IStorageOperation, IStorageSaleProduct, IStorageStats } from "../types";
+import { DataTableSortStatus } from "mantine-datatable";
 
 function useStorageExists({
     id,
@@ -44,4 +45,26 @@ function useSetStats({ id }: { id: string }) {
     });
 }
 
-export default { useStorageExists, useGetStats, useSetStats };
+interface IUseGetHistoryProps {
+    id: string;
+    page: number;
+    limit: string | null;
+    sortStatus: DataTableSortStatus;
+    searchValue: string;
+    enabled?: boolean;
+}
+function useGetHistory({ id, page, limit, sortStatus, searchValue, enabled = true }: IUseGetHistoryProps) {
+    return useQuery({
+        queryKey: ["history", id, page, limit, sortStatus, searchValue],
+        queryFn: () =>
+            apiClient
+                .get(
+                    `/storages/${id}/getOperationsHistory/?page=${page}&limit=${limit}&sortField=${sortStatus.columnAccessor}&dir=${sortStatus.direction}&search=${searchValue}`
+                )
+                .then((res) => res.data.data),
+        select: (data) => data as { operations: IStorageOperation[]; count: number },
+        enabled,
+    });
+}
+
+export default { useStorageExists, useGetStats, useSetStats, useGetHistory };

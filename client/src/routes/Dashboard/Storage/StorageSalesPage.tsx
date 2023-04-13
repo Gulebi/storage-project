@@ -13,6 +13,7 @@ import {
     Stack,
     TextInput,
     LoadingOverlay,
+    ActionIcon,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { modals } from "@mantine/modals";
@@ -22,6 +23,7 @@ import apiClient from "../../../common/api";
 import { DataTable, DataTableSortStatus } from "mantine-datatable";
 import { useNavigate, useParams } from "react-router-dom";
 import { storageService, productsService } from "../../../services";
+import { IconTrash } from "@tabler/icons-react";
 
 function DashboardSalesPage() {
     const [searchCode, setSearchCode] = useState<string>("");
@@ -74,7 +76,7 @@ function DashboardSalesPage() {
         });
     };
 
-    const openConfirmModal = () => {
+    const openSellConfirmModal = () => {
         modals.openConfirmModal({
             title: "Sell all products",
             children: <Text align="center">Are you sure you want to sell all products?</Text>,
@@ -117,7 +119,8 @@ function DashboardSalesPage() {
                             <tr>
                                 <th style={{ width: "10%" }}>Code</th>
                                 <th style={{ width: "35%" }}>Name</th>
-                                <th style={{ width: "20%" }}>Total Amount</th>
+                                <th style={{ width: "10%" }}>Price</th>
+                                <th style={{ width: "10%" }}>Amount</th>
                                 <th style={{ width: "35%" }}>Control</th>
                             </tr>
                         </thead>
@@ -125,6 +128,7 @@ function DashboardSalesPage() {
                             <tr>
                                 <td>{foundData?.code}</td>
                                 <td>{foundData?.name}</td>
+                                <td>{foundData?.sellingPrice}</td>
                                 <td>{foundData?.totalAmount}</td>
                                 <td>
                                     <form onSubmit={addForm.onSubmit((values) => onAddOne(values))}>
@@ -163,24 +167,25 @@ function DashboardSalesPage() {
                     columns={[
                         { accessor: "code", width: "10%" },
                         { accessor: "name", width: "35%" },
-                        { accessor: "amount", width: "20%" },
+                        { accessor: "sellingPrice", width: "15%", title: "Price" },
+                        { accessor: "amount", width: "15%" },
                         {
                             accessor: "control",
-                            width: "35%",
+                            width: "25%",
                             render: (product: IStorageSaleProduct) => (
                                 <Group>
-                                    <Button
+                                    <Button compact onClick={() => onSellOne(product)}>
+                                        Sell One
+                                    </Button>
+                                    <ActionIcon
                                         color="red"
-                                        compact
+                                        variant="filled"
                                         onClick={() => {
                                             setSales(sales.filter((item) => item._id !== product._id));
                                         }}
                                     >
-                                        Remove
-                                    </Button>
-                                    <Button compact onClick={() => onSellOne(product)}>
-                                        Sell One
-                                    </Button>
+                                        <IconTrash size="1.3rem" />
+                                    </ActionIcon>
                                 </Group>
                             ),
                         },
@@ -190,8 +195,11 @@ function DashboardSalesPage() {
                 />
             </ScrollArea>
 
-            <Group position="center" mt="md">
-                <Button size="md" disabled={sales.length === 0} onClick={openConfirmModal}>
+            <Group position="apart" mt="md" px="md">
+                <Title order={3}>
+                    ${sales.reduce((acc, item) => acc + item.sellingPrice * item.amount, 0).toFixed(2)}
+                </Title>
+                <Button size="md" disabled={sales.length === 0} onClick={openSellConfirmModal}>
                     Sell All
                 </Button>
             </Group>

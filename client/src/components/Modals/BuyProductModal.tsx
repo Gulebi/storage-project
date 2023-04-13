@@ -1,6 +1,7 @@
+import { Icon123, IconCoin } from "@tabler/icons-react";
 import { IBuyFormProps } from "../../routes/Dashboard/ProductsPage";
 import { IProduct } from "../../types";
-import { Card, Flex, Grid, NumberInput, Button, Image, Text, createStyles } from "@mantine/core";
+import { Card, Flex, Grid, NumberInput, Button, Image, Text, createStyles, TextInput, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
 const useStyles = createStyles((theme) => ({
@@ -25,7 +26,7 @@ function BuyProductModal({ data, onFormSubmit }: IBuyProductModalProps) {
     });
 
     return (
-        <Card key={data._id} padding="lg" radius="md" w={300}>
+        <Card key={data._id} padding="lg" radius="md" w={380}>
             <Card.Section p="md">
                 <Image
                     src={data.image}
@@ -37,16 +38,26 @@ function BuyProductModal({ data, onFormSubmit }: IBuyProductModalProps) {
                 />
             </Card.Section>
 
-            <Flex justify="space-between" gap={50} mt="md">
-                <Text weight={500}>{data.name}</Text>
-                <Text weight={500}>{data.manufacturerPrice + "$"}</Text>
-            </Flex>
-            <Text size="sm" mb="xs" color="dimmed">
-                {data.category}
-            </Text>
-            <Text size="sm" mb="sm">
-                {data.manufacturer}
-            </Text>
+            <Grid gutter={0}>
+                <Grid.Col span={9}>
+                    <Text weight={500}>{data.name}</Text>
+                </Grid.Col>
+                <Grid.Col span={3}>
+                    <Text weight={500} align="end">
+                        ${data.manufacturerPrice}
+                    </Text>
+                </Grid.Col>
+                <Grid.Col span={12}>
+                    <Text size="sm" mb="xs" color="dimmed">
+                        {data.category}
+                    </Text>
+                </Grid.Col>
+                <Grid.Col span={12}>
+                    <Text size="sm" mb="sm">
+                        {data.manufacturer}
+                    </Text>
+                </Grid.Col>
+            </Grid>
 
             <form
                 onSubmit={form.onSubmit(({ amount }) =>
@@ -54,10 +65,28 @@ function BuyProductModal({ data, onFormSubmit }: IBuyProductModalProps) {
                 )}
             >
                 <Grid align="end">
-                    <Grid.Col span={8}>
-                        <NumberInput min={1} placeholder="Amount" label="Amount" {...form.getInputProps("amount")} />
+                    <Grid.Col span={5}>
+                        <NumberInput
+                            min={1}
+                            max={100}
+                            placeholder="Amount"
+                            label="Amount"
+                            {...form.getInputProps("amount")}
+                            icon={<Icon123 size="1.3rem" />}
+                            stepHoldDelay={500}
+                            stepHoldInterval={100}
+                        />
                     </Grid.Col>
                     <Grid.Col span={4}>
+                        <NumberInput
+                            label="Total Price"
+                            value={data.manufacturerPrice * form.values.amount}
+                            sx={{ pointerEvents: "none" }}
+                            icon={<IconCoin size="1.3rem" />}
+                            hideControls
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={3}>
                         <Button type="submit" fullWidth>
                             Buy
                         </Button>

@@ -99,7 +99,7 @@ function DashboardNavbar({ onLogOut, onLoadBalance, onChangeBalance, balance, us
                     <>
                         <Navbar.Section>
                             <Group position="apart">
-                                <Title order={5}>{`Balance: ${balance}`}</Title>
+                                <Title order={5}>{`Balance: $${balance}`}</Title>
                                 <Group spacing="xs">
                                     <ActionIcon variant="filled" color="blue" onClick={onChangeBalance}>
                                         <IconEdit size="1.3rem" />

@@ -32,6 +32,7 @@ function useSellProduct({ id }: { id: string }) {
         mutationFn: (product: IStorageSaleProduct) =>
             apiClient.post(`/storages/${id}/sellProduct`, {
                 productId: product._id,
+                sellingPrice: product.sellingPrice,
                 amount: product.amount,
             }),
     });

@@ -354,20 +354,16 @@ router.post("/:id/sellProduct", async (req, res) => {
         res.set("Content-Type", "application/json");
 
         const { id: storageId } = req.params;
-        const { productId, amount } = req.body;
+        const { productId, sellingPrice, amount } = req.body;
 
         await StorageModel.findOneAndUpdate(
             { _id: storageId, "products._id": productId },
             {
                 $inc: { "products.$.totalAmount": -amount },
-                $set: { "products.$.sellingPrice": sellingPrice },
-                $push: { "products.$.sellingPriceHistory": sellingPrice },
+                $inc: { totalMoney: sellingPrice * amount },
+                $push: { operationsHistory: { _id: productId, operationName: "selling", amount } },
             }
         );
-
-        await StorageModel.findByIdAndUpdate(storageId, {
-            $push: { operationsHistory: { _id: productId, operationName: "selling", amount } },
-        });
 
         return res.status(200).send({ message: "Success" });
     } catch (error) {
@@ -458,6 +454,7 @@ router.get("/:id/getOperationsHistory", async (req, res) => {
                     localField: "operationsHistory._id",
                     foreignField: "_id",
                     as: "productDetails",
+                    pipeline: [{ $project: { name: 1 } }],
                 },
             },
             {
