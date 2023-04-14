@@ -5,7 +5,7 @@ import { modals } from "@mantine/modals";
 import { IProduct } from "../../types";
 import { DataTable, DataTableSortStatus } from "mantine-datatable";
 import { IconSearch } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BuyProductModal } from "../../components";
 import { useDebouncedState } from "@mantine/hooks";
 import { useParams } from "react-router-dom";
@@ -23,6 +23,8 @@ function ProductsPage() {
     const [searchValue, setSearchValue] = useDebouncedState("", 200);
     const { id: storageId } = useParams();
 
+    const queryClient = useQueryClient();
+
     const { isLoading, error, data } = useQuery({
         queryKey: ["data", page, itemsPerPage, sortStatus, searchValue],
         queryFn: () =>
@@ -34,14 +36,17 @@ function ProductsPage() {
 
     const onBuyFormSubmit = ({ id, price, amount }: IBuyFormProps) => {
         modals.closeAll();
+
         apiClient.post(`/storages/${storageId}/buyProduct`, { productId: id, buyingPrice: price, amount });
     };
 
     const onOpenModal = (data: IProduct) => {
+        const balance = queryClient.getQueryData<number>(["balance", storageId])!;
+
         modals.open({
             title: "Buy Product",
             size: "auto",
-            children: <BuyProductModal data={data} onFormSubmit={onBuyFormSubmit} />,
+            children: <BuyProductModal data={data} balance={balance} onFormSubmit={onBuyFormSubmit} />,
         });
     };
 

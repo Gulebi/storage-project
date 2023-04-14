@@ -15,5 +15,6 @@ export { default as BuyProductModal } from "./Modals/BuyProductModal";
 export { default as StorageCreateModal } from "./Modals/StorageCreateModal";
 export { default as ErrorModal } from "./Modals/ErrorModal";
 export { default as ChangeUserInfoModal } from "./Modals/ChangeUserInfoModal";
+export { default as ChangeStorageNameModal } from "./Modals/ChangeStorageNameModal";
 
 export { default as ProfileDrawer } from "./Drawers/ProfileDrawer";

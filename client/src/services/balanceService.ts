@@ -5,8 +5,8 @@ import { IStorageStats } from "../types";
 function useGetBalance({ id, enabled }: { id: string; enabled?: boolean }) {
     return useQuery({
         queryKey: ["balance", id],
-        queryFn: () => apiClient.get(`/storages/${id}/getBalance`).then((res) => res.data.data),
-        select: (data) => data.totalMoney as number,
+        queryFn: () => apiClient.get(`/storages/${id}/getBalance`).then((res) => res.data.data.totalMoney),
+        select: (data) => data as number,
         enabled,
     });
 }
@@ -19,7 +19,7 @@ function useSetBalance({ id }: { id: string }) {
         onMutate: async (balance) => {
             await queryClient.cancelQueries({ queryKey: ["balance", id] });
 
-            queryClient.setQueryData(["balance", id], { data: { data: { totalMoney: balance } } });
+            queryClient.setQueryData(["balance", id], balance);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["balance", id] });

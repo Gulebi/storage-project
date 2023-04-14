@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "../common/api";
-import { IUser } from "../types";
+import { IStorage, IUser } from "../types";
 
 function useGetUserInfo({ id, enabled }: { id: string; enabled?: boolean }) {
     return useQuery({
@@ -23,4 +23,13 @@ function useSetUserInfo({ id }: { id: string }) {
     });
 }
 
-export default { useGetUserInfo, useSetUserInfo };
+function useGetStorages({ id, enabled = true }: { id: string; enabled?: boolean }) {
+    return useQuery({
+        queryKey: ["userStorages", id],
+        queryFn: () => apiClient.get(`/users/${id}/getStorages`).then((res) => res.data.data),
+        select: (data) => data as IStorage[],
+        enabled,
+    });
+}
+
+export default { useGetUserInfo, useSetUserInfo, useGetStorages };

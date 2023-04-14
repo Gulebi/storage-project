@@ -24,7 +24,7 @@ router.put("/:id/addStorage", async (req, res) => {
         res.set("Content-Type", "application/json");
 
         const { id } = req.params;
-        const { id: storageId, status } = req.body;
+        const { storageId, status } = req.body;
 
         const mRes = await UserModel.findByIdAndUpdate(id, { $push: { storages: { _id: storageId, status } } });
 

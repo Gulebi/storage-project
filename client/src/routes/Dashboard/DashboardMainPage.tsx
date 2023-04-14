@@ -5,6 +5,7 @@ import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { IChangeBalanceFormValues } from "../../components/Modals/ChangeBalanceModal";
 import { useDisclosure } from "@mantine/hooks";
 import { storageService, balanceService, userService } from "../../services";
+import { useState } from "react";
 
 const hideNavbarPages = ["/dashboard", "/dashboard/storage/create"];
 

@@ -1,8 +1,9 @@
 import { Icon123, IconCoin } from "@tabler/icons-react";
 import { IBuyFormProps } from "../../routes/Dashboard/ProductsPage";
 import { IProduct } from "../../types";
-import { Card, Flex, Grid, NumberInput, Button, Image, Text, createStyles, TextInput, Stack } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { Card, Grid, NumberInput, Button, Image, Text, createStyles } from "@mantine/core";
+import { useEffect, useState } from "react";
+import { notifications } from "@mantine/notifications";
 
 const useStyles = createStyles((theme) => ({
     cardImage: {
@@ -13,17 +14,27 @@ const useStyles = createStyles((theme) => ({
 
 interface IBuyProductModalProps {
     onFormSubmit: ({ id, amount }: IBuyFormProps) => void;
+    balance: number;
     data: IProduct;
 }
 
-function BuyProductModal({ data, onFormSubmit }: IBuyProductModalProps) {
+function BuyProductModal({ data, balance, onFormSubmit }: IBuyProductModalProps) {
     const { classes } = useStyles();
 
-    const form = useForm({
-        initialValues: {
-            amount: 1,
-        },
-    });
+    const [amount, setAmount] = useState(1);
+
+    const getPrice = () => {
+        return data.manufacturerPrice * amount;
+    };
+
+    const showErrorNotification = () => {
+        notifications.show({
+            title: "Error!",
+            message: "You don't have enough money!",
+            autoClose: 3000,
+            color: "red",
+        });
+    };
 
     return (
         <Card key={data._id} padding="lg" radius="md" w={380}>
@@ -59,40 +70,43 @@ function BuyProductModal({ data, onFormSubmit }: IBuyProductModalProps) {
                 </Grid.Col>
             </Grid>
 
-            <form
-                onSubmit={form.onSubmit(({ amount }) =>
-                    onFormSubmit({ amount, price: data.manufacturerPrice, id: data._id })
-                )}
-            >
-                <Grid align="end">
-                    <Grid.Col span={5}>
-                        <NumberInput
-                            min={1}
-                            max={100}
-                            placeholder="Amount"
-                            label="Amount"
-                            {...form.getInputProps("amount")}
-                            icon={<Icon123 size="1.3rem" />}
-                            stepHoldDelay={500}
-                            stepHoldInterval={100}
-                        />
-                    </Grid.Col>
-                    <Grid.Col span={4}>
-                        <NumberInput
-                            label="Total Price"
-                            value={data.manufacturerPrice * form.values.amount}
-                            sx={{ pointerEvents: "none" }}
-                            icon={<IconCoin size="1.3rem" />}
-                            hideControls
-                        />
-                    </Grid.Col>
-                    <Grid.Col span={3}>
-                        <Button type="submit" fullWidth>
-                            Buy
-                        </Button>
-                    </Grid.Col>
-                </Grid>
-            </form>
+            <Grid align="end">
+                <Grid.Col span={5}>
+                    <NumberInput
+                        min={1}
+                        max={100}
+                        placeholder="Amount"
+                        label="Amount"
+                        value={amount}
+                        onChange={(value) => setAmount(value || 1)}
+                        icon={<Icon123 size="1.3rem" />}
+                        stepHoldDelay={500}
+                        stepHoldInterval={100}
+                    />
+                </Grid.Col>
+                <Grid.Col span={4}>
+                    <NumberInput
+                        label="Total Price"
+                        value={getPrice()}
+                        precision={2}
+                        sx={{ pointerEvents: "none" }}
+                        icon={<IconCoin size="1.3rem" />}
+                        hideControls
+                    />
+                </Grid.Col>
+                <Grid.Col span={3}>
+                    <Button
+                        fullWidth
+                        onClick={() => {
+                            getPrice() > balance
+                                ? showErrorNotification()
+                                : onFormSubmit({ amount, price: data.manufacturerPrice, id: data._id });
+                        }}
+                    >
+                        Buy
+                    </Button>
+                </Grid.Col>
+            </Grid>
         </Card>
     );
 }

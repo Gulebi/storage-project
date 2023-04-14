@@ -5,9 +5,10 @@ import { IconEdit } from "@tabler/icons-react";
 interface IStorageInfoCardProps {
     data: IStorageStats;
     isAdmin: boolean;
+    onActionChangeName: () => void;
 }
 
-function StorageInfoCard({ data, isAdmin }: IStorageInfoCardProps) {
+function StorageInfoCard({ data, isAdmin, onActionChangeName }: IStorageInfoCardProps) {
     return (
         <Card w="100%" shadow="sm" padding="xl" radius="md" withBorder>
             <Title order={4} align="center">
@@ -23,7 +24,7 @@ function StorageInfoCard({ data, isAdmin }: IStorageInfoCardProps) {
                         <Text fw={500}>{data.name}</Text>
                     </div>
                     {isAdmin && (
-                        <ActionIcon variant="filled" color="blue">
+                        <ActionIcon variant="filled" color="blue" onClick={onActionChangeName}>
                             <IconEdit size="1.3rem" />
                         </ActionIcon>
                     )}
@@ -36,7 +37,7 @@ function StorageInfoCard({ data, isAdmin }: IStorageInfoCardProps) {
                 </Title>
                 <Text fw={500}>{new Date(data.creationDate).toUTCString()}</Text>
             </Stack>
-            {isAdmin && (
+            {/* {isAdmin && (
                 <>
                     <Divider my="sm" />
                     <Stack spacing={0} ml={10}>
@@ -49,7 +50,7 @@ function StorageInfoCard({ data, isAdmin }: IStorageInfoCardProps) {
                         </Group>
                     </Stack>
                 </>
-            )}
+            )} */}
         </Card>
     );
 }

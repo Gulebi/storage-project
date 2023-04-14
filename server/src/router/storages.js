@@ -11,9 +11,9 @@ router.post("/create", async (req, res) => {
 
         const { name, adminId } = req.body;
 
-        await StorageModel.create({ name, adminId });
+        const mRes = await StorageModel.create({ name, adminId: new Types.ObjectId(adminId) });
 
-        return res.status(201).send({ message: "Success" });
+        return res.status(201).send({ message: "Success", data: mRes });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });
@@ -340,6 +340,7 @@ router.post("/:id/buyProduct", async (req, res) => {
 
         await StorageModel.findByIdAndUpdate(storageId, {
             $push: { operationsHistory: { _id: productId, operationName: "buying", amount } },
+            $inc: { totalMoney: -(buyingPrice * amount) },
         });
 
         return res.status(201).send({ message: "Success" });
@@ -498,6 +499,22 @@ router.get("/:id/clearOperationsHistory", async (req, res) => {
         const { id } = req.params;
 
         await StorageModel.findByIdAndUpdate(id, { operationsHistory: [] });
+
+        return res.status(201).send({ message: "Success" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.post("/:id/setName", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id } = req.params;
+        const { name } = req.body;
+
+        await StorageModel.findByIdAndUpdate(id, { name });
 
         return res.status(201).send({ message: "Success" });
     } catch (error) {

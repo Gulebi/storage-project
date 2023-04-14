@@ -1,33 +1,38 @@
-import { useEffect, useState } from "react";
 import { StorageCard, StorageCreateModal } from "../../components";
 import { Button, Center, Container, Divider, Flex, Group, Text, Title } from "@mantine/core";
 import apiClient from "../../common/api";
 import { modals } from "@mantine/modals";
-import { IStorage } from "../../types";
 import { useNavigate } from "react-router-dom";
+import { storageService, userService } from "../../services";
+import { useQueryClient } from "@tanstack/react-query";
 
 function StorageSelectionPage() {
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const [storages, setStorages] = useState<IStorage[]>();
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const currentUserId = localStorage.getItem("currentUserId");
+    const createMutation = storageService.useCreate();
 
-                const storagesRes = await apiClient.get(`/users/${currentUserId}/getStorages`);
+    const currentUserId = localStorage.getItem("currentUserId");
 
-                setStorages(storagesRes.data.data);
-            } catch (error) {
-                console.log({ error });
-            } finally {
-            }
-        })();
-    }, []);
+    const { data: storages } = userService.useGetStorages({ id: currentUserId! });
 
-    const onStorageCreate = async (values: { name: string }) => {
+    const onStorageCreate = async ({ name }: { name: string }) => {
         modals.closeAll();
-        console.log(values);
+        createMutation.mutate(
+            { name, adminId: currentUserId! },
+            {
+                onSuccess: (data) => {
+                    apiClient
+                        .put(`/users/${currentUserId}/addStorage`, {
+                            storageId: data.data.data._id,
+                            status: "admin",
+                        })
+                        .then(() => {
+                            queryClient.invalidateQueries({ queryKey: ["userStorages", currentUserId] });
+                        });
+                },
+            }
+        );
     };
 
     const onStorageSelect = async (id: string) => {
@@ -39,11 +44,9 @@ function StorageSelectionPage() {
             title: "Create Storage",
 
             children: (
-                <>
-                    <Center>
-                        <StorageCreateModal onFormSubmit={onStorageCreate} />
-                    </Center>
-                </>
+                <Center>
+                    <StorageCreateModal onFormSubmit={onStorageCreate} />
+                </Center>
             ),
         };
     };

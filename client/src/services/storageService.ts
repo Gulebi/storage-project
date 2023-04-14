@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "../common/api";
 import { IStorageOperation, IStorageSaleProduct, IStorageStats } from "../types";
 import { DataTableSortStatus } from "mantine-datatable";
+import userService from "./userService";
 
 function useStorageExists({
     id,
@@ -67,4 +68,27 @@ function useGetHistory({ id, page, limit, sortStatus, searchValue, enabled = tru
     });
 }
 
-export default { useStorageExists, useGetStats, useSetStats, useGetHistory };
+function useSetName({ id }: { id: string }) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (name: string) => apiClient.post(`/storages/${id}/setName`, { name }),
+        onMutate: async (name) => {
+            await queryClient.cancelQueries({ queryKey: ["stats", id] });
+
+            queryClient.setQueryData(["stats", id], (old: any) => ({ ...old, name }));
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["stats", id] });
+        },
+    });
+}
+
+function useCreate() {
+    return useMutation({
+        mutationFn: ({ name, adminId }: { name: string; adminId: string }) =>
+            apiClient.post(`/storages/create`, { name, adminId }),
+    });
+}
+
+export default { useStorageExists, useGetStats, useSetStats, useGetHistory, useSetName, useCreate };
