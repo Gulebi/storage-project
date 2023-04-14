@@ -79,7 +79,6 @@ export interface IUser {
     email: string;
     username: string;
     password: string;
-    imageURL: string;
     storages: { _id: string; status: "admin" | "user" }[];
 }
 

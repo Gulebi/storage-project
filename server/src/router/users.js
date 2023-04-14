@@ -19,21 +19,16 @@ router.get("/:id/info", async (req, res) => {
     }
 });
 
-router.put("/:id/addStorage", (req, res) => {
+router.put("/:id/addStorage", async (req, res) => {
     try {
         res.set("Content-Type", "application/json");
 
         const { id } = req.params;
         const { id: storageId, status } = req.body;
 
-        UserModel.findByIdAndUpdate(id, { $push: { storages: { _id: storageId, status } } }).then(
-            (doc) => {
-                return res.status(200).send({ message: "Success", data: doc });
-            },
-            () => {
-                return res.status(500).send({ message: "Error" });
-            }
-        );
+        const mRes = await UserModel.findByIdAndUpdate(id, { $push: { storages: { _id: storageId, status } } });
+
+        return res.status(200).send({ message: "Success", data: mRes });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });
@@ -96,6 +91,22 @@ router.get("/:id/getStorages", async (req, res) => {
         ]);
 
         return res.status(200).send({ message: "Success", data: mRes[0]?.storages });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: "Error" });
+    }
+});
+
+router.post("/:id/setInfo", async (req, res) => {
+    try {
+        res.set("Content-Type", "application/json");
+
+        const { id } = req.params;
+        const { value, field } = req.body;
+
+        const mRes = await UserModel.findByIdAndUpdate(id, { [field]: value });
+
+        return res.status(201).send({ message: "Success", data: mRes });
     } catch (error) {
         console.error(error);
         return res.status(500).send({ message: "Error" });

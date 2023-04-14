@@ -5,6 +5,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Logo, ProfileDrawer, UserButton } from "../components";
 import { useDisclosure } from "@mantine/hooks";
 import { IUser } from "../types";
+import md5 from "md5";
 
 interface IDashboardNavbarProps {
     onLogOut: () => void;
@@ -85,7 +86,7 @@ function DashboardNavbar({ onLogOut, onLoadBalance, onChangeBalance, balance, us
                         <Divider my="sm" />
 
                         <UserButton
-                            image={userInfo.imageURL}
+                            image={`https://www.gravatar.com/avatar/${md5(userInfo.email.trim().toLowerCase())}/?d=mp`}
                             name={userInfo.username}
                             email={userInfo.email}
                             onButtonClick={drawerOpen}

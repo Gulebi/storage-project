@@ -1,6 +1,5 @@
 const { UserModel } = require("../Models");
 const { Router } = require("express");
-const md5 = require("md5");
 
 const router = Router();
 
@@ -35,9 +34,7 @@ router.post("/signup", (req, res) => {
 
         const { username, email, password } = req.body;
 
-        const imageURL = `https://www.gravatar.com/avatar/${md5(email.trim().toLowerCase())}/?d=mp`;
-
-        UserModel.create({ username, email, password, imageURL }).then(
+        UserModel.create({ username, email, password }).then(
             (doc) => {
                 return res.status(201).send({ message: "Success", data: doc._id });
             },

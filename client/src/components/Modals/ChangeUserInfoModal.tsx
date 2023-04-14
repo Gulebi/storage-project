@@ -4,13 +4,14 @@ import { upperFirst } from "@mantine/hooks";
 
 interface IChangeUserInfoModalProps {
     onFormSubmit: ({ value, field }: { value: string; field: "username" | "email" }) => void;
+    defaultData: string;
     field: "username" | "email";
 }
 
-function ChangeUserInfoModal({ onFormSubmit, field }: IChangeUserInfoModalProps) {
+function ChangeUserInfoModal({ onFormSubmit, defaultData, field }: IChangeUserInfoModalProps) {
     const form = useForm({
         initialValues: {
-            value: "",
+            value: defaultData || "",
         },
 
         validate: {
@@ -37,7 +38,7 @@ function ChangeUserInfoModal({ onFormSubmit, field }: IChangeUserInfoModalProps)
                     />
                 </Grid.Col>
                 <Grid.Col span={4}>
-                    <Button type="submit">Create</Button>
+                    <Button type="submit">Change</Button>
                 </Grid.Col>
             </Grid>
         </form>

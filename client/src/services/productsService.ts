@@ -47,7 +47,7 @@ interface IUseGetStorageProductsProps {
 }
 function useGetStorageProducts({ id, page, limit, sortStatus, searchValue }: IUseGetStorageProductsProps) {
     return useQuery({
-        queryKey: ["getProducts", id, page, limit, sortStatus, searchValue],
+        queryKey: ["products", id, page, limit, sortStatus, searchValue],
         queryFn: () =>
             apiClient
                 .get(
@@ -59,15 +59,25 @@ function useGetStorageProducts({ id, page, limit, sortStatus, searchValue }: IUs
 }
 
 function useDeleteStorageProduct({ id }: { id: string }) {
+    const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: (productId: string) => apiClient.post(`/storages/${id}/deleteProduct`, { productId }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products", id] });
+        },
     });
 }
 
 function useChangeStorageProduct({ id }: { id: string }) {
+    const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: ({ value, id: productId, field }: { value: number; id: string; field: string }) =>
             apiClient.post(`/storages/${id}/changeProduct${upperFirst(field)}`, { productId, newValue: value }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products", id] });
+        },
     });
 }
 
