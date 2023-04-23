@@ -35,22 +35,25 @@ function DashboardHistoryPage() {
                     fetching={isLoading}
                     mih={150}
                     records={data?.operations}
+                    // columns={[
+                    //     { accessor: "name", width: "50%", sortable: true },
+                    //     { accessor: "operationName", width: "20%", sortable: true },
+                    //     { accessor: "amount", width: "10%", sortable: true },
+                    //     { accessor: "operationDate", width: "20%", sortable: true },
+                    // ]}
                     columns={[
-                        { accessor: "name", width: "50%", sortable: true },
-                        { accessor: "operationName", width: "20%", sortable: true },
-                        { accessor: "amount", width: "10%", sortable: true },
-                        { accessor: "operationDate", width: "20%", sortable: true },
+                        { accessor: "name", width: "50%" },
+                        { accessor: "operationName", width: "20%" },
+                        { accessor: "amount", width: "10%" },
+                        { accessor: "operationDate", width: "20%" },
                     ]}
                     noRecordsText="No operations to show"
-                    onRowClick={(operation) => {
-                        // onOpenModal(operation);
-                    }}
-                    sortStatus={sortStatus}
-                    onSortStatusChange={setSortStatus}
-                    page={page}
-                    onPageChange={setPage}
-                    totalRecords={data?.count}
-                    recordsPerPage={parseInt(itemsPerPage || "10")}
+                    // sortStatus={sortStatus}
+                    // onSortStatusChange={setSortStatus}
+                    // page={page}
+                    // onPageChange={setPage}
+                    // totalRecords={data?.count}
+                    // recordsPerPage={parseInt(itemsPerPage || "10")}
                     idAccessor="_id"
                 />
             </ScrollArea>
